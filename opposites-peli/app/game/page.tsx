@@ -1,8 +1,8 @@
 'use client';
 import { useState } from 'react';
 
-
-const lang = 'fi'; // pitää hakee optioneista kieli
+const difficulty = 'normal' // pitää hakee optioneista vaikeustaso, ja sen mukaan hakea oikea botin vastausnopeus
+const lang = 'fi';          // pitää hakee optioneista kieli
 const words = await import(`../../data/words.${lang}.json`).then(m => m.default);
 
 export default function GamePage() {
@@ -73,7 +73,7 @@ export default function GamePage() {
 
       <div style={{ marginTop: '10px', height: '24px' }}>
         {status === 'correct' && <span style={{ color: 'green' }}>Oikein!</span>}
-        {status === 'wrong' && <span style={{ color: 'red' }}>Väärin, yritäpä uusiksi.</span>}
+        {status === 'wrong' && <span style={{ color: 'red' }}>Väärin.</span>}
       </div>
 
       <p style={{ color: '#666', fontSize: '0.8rem' }}>
