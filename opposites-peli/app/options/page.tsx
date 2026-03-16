@@ -105,7 +105,7 @@ export default function Options() {
             fontSize: "1.2rem",
           }}
         >
-          Polar Opposites is a fun word game where you need to find the opposite of words. Adjust the volume and difficulty to your liking!
+          ohjeet tähä
         </div>
       )}
 
