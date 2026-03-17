@@ -27,7 +27,7 @@ export default function GamePage() {
   const [botText, setBotText] = useState('');
   const [botIndex, setBotIndex] = useState(0);
 
-  type Status = '' | 'correct' | 'wrong';
+  type Status = '' | 'correct' | 'wrong' | 'botWon';
   const [status, setStatus] = useState<Status>('');
 
   const currentPair = gameData[currentIndex];
@@ -36,8 +36,10 @@ export default function GamePage() {
   // BOT TYPING EFFECT
  
 useEffect(() => {
-  if (!currentPair) return;
-
+  if (!currentPair){
+    console.log("aksjdhflkasjdf")
+    return;
+  }
   const delay = Math.random() * startingDelay[difficulty];
   const answer = currentPair[1];
 
@@ -55,6 +57,8 @@ useEffect(() => {
       setBotIndex(i);
 
       if (i >= answer.length) {
+        console.log("LOSER BOT WINS");
+        setStatus('botWon');
         clearInterval(interval);
       }
     }, speedMap[difficulty]);
@@ -117,7 +121,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
             style={{ 
               padding: '8px', 
               border: `2px solid ${
-                status === 'correct' ? 'green' : status === 'wrong' ? 'red' : '#ccc'
+                status === 'correct' ? 'green' : status === 'wrong' ? 'red' : status === 'botWon' ? 'red' : '#ccc'
               }`
             }}
           />
@@ -129,6 +133,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         <div style={{ marginTop: '10px', height: '24px' }}>
           {status === 'correct' && <span style={{ color: 'green' }}>Oikein!</span>}
           {status === 'wrong' && <span style={{ color: 'red' }}>Väärin.</span>}
+          {status === 'botWon' && <span style={{ color: 'red' }}>Botti voitti!</span>}
         </div>
 
         <p style={{ color: '#666', fontSize: '0.8rem' }}>
@@ -148,7 +153,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
             style={{ 
               padding: '8px', 
               border: `2px solid ${
-                status === 'correct' ? 'green' : status === 'wrong' ? 'red' : '#ccc'
+                status === 'correct' ? 'green' : status === 'wrong' ? 'red' : status === 'botWon' ? 'red': '#ccc'
               }`
             }}
         >
