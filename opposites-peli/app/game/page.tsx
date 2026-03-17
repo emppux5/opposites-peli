@@ -24,12 +24,11 @@ export default function GamePage() {
     if (userInput.trim().toLowerCase() === answer.toLowerCase()) {
       setStatus('correct');
       
-      // Move to next word after a brief delay
-      setTimeout(() => {
+        setTimeout(() => {
         setCurrentIndex(prev => prev + 1);
         setUserInput('');
         setStatus('');
-      }, 800);
+      }, 300);
     } else {
       setStatus('wrong');
     }
@@ -38,7 +37,7 @@ export default function GamePage() {
   if (isFinished) {
     return (
       <div style={{ padding: '20px' }}>
-        <h1>Peli loppui!</h1>
+        <h1>Peli loppui</h1>
         <button onClick={() => setCurrentIndex(0)}>Pelaa uudelleen</button>
       </div>
     );
@@ -59,7 +58,7 @@ export default function GamePage() {
           value={userInput} 
           onChange={(e) => {
             setUserInput(e.target.value);
-            if (status === 'wrong') setStatus(''); // Reset error color when typing
+            if (status === 'wrong') setStatus(''); 
           }}
           style={{ 
             padding: '8px', 
@@ -80,5 +79,6 @@ export default function GamePage() {
         Sana {currentIndex + 1} / {gameData.length}
       </p>
     </div>
+    
   );
 }
