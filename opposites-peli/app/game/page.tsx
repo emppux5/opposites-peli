@@ -1,38 +1,89 @@
 'use client';
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 
-const difficulty = 'normal' // pitää hakee optioneista vaikeustaso, ja sen mukaan hakea oikea botin vastausnopeus
-const lang = 'fi';          // pitää hakee optioneista kieli
+const difficulty = 'normal'; 
+const lang = 'fi';
+
 const words = await import(`../../data/words.${lang}.json`).then(m => m.default);
 
+// typing speeds (ms per character)
+const startingDelay: Record<string, number> = {
+  easy: 1500,
+  normal: 1000,
+  hard: 500,
+};
+
+const speedMap: Record<string, number> = {
+  easy: 300,
+  normal: 200,
+  hard: 100,
+};
+
 export default function GamePage() {
-    const gameData = Object.entries(words) as [string, string][];
+  const gameData = Object.entries(words) as [string, string][];
 
-    const [currentIndex, setCurrentIndex] = useState(0);
-    const [userInput, setUserInput] = useState('');
-    type Status = '' | 'correct' | 'wrong';
-    const [status, setStatus] = useState<Status>('');
-    const currentPair = gameData[currentIndex];
-    const isFinished = currentIndex >= gameData.length;
+  const [currentIndex, setCurrentIndex] = useState(0);
+  const [userInput, setUserInput] = useState('');
+  const [botText, setBotText] = useState('');
+  const [botIndex, setBotIndex] = useState(0);
 
-    const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-    if (!currentPair) return null;
+  type Status = '' | 'correct' | 'wrong';
+  const [status, setStatus] = useState<Status>('');
 
-    const [question, answer] = currentPair;
+  const currentPair = gameData[currentIndex];
+  const isFinished = currentIndex >= gameData.length;
 
-    if (userInput.trim().toLowerCase() === answer.toLowerCase()) {
-      setStatus('correct');
-      
-        setTimeout(() => {
-        setCurrentIndex(prev => prev + 1);
-        setUserInput('');
-        setStatus('');
-      }, 300);
-    } else {
-      setStatus('wrong');
-    }
+  // BOT TYPING EFFECT
+ 
+useEffect(() => {
+  if (!currentPair) return;
+
+  const delay = Math.random() * startingDelay[difficulty];
+  const answer = currentPair[1];
+
+  setBotText('');
+  setBotIndex(0);
+
+  let interval: NodeJS.Timeout;
+
+  const timeout = setTimeout(() => {
+    let i = 0;
+
+    interval = setInterval(() => {
+      i++;
+      setBotText(answer.slice(0, i));
+      setBotIndex(i);
+
+      if (i >= answer.length) {
+        clearInterval(interval);
+      }
+    }, speedMap[difficulty]);
+  }, delay);
+
+  return () => {
+    clearTimeout(timeout);
+    if (interval) clearInterval(interval);
   };
+}, [currentIndex]);
+
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+  if (!currentPair) return;
+
+  const [, answer] = currentPair;
+
+  if (userInput.trim().toLowerCase() === answer.toLowerCase()) {
+    setStatus('correct');
+
+    setTimeout(() => {
+      setCurrentIndex(prev => prev + 1);
+      setUserInput('');
+      setStatus('');
+    }, 300);
+  } else {
+    setStatus('wrong');
+  }
+};
 
   if (isFinished) {
     return (
@@ -44,41 +95,74 @@ export default function GamePage() {
   }
 
   return (
-    <div style={{ padding: '20px', maxWidth: '400px' }}>
-      <h1>Vastakohdat ({lang})</h1>
+    <div style={{ display: 'flex', gap: '40px', padding: '20px' }}>
       
-      <div style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>
-        Mikä on sanan <strong>{currentPair[0]}</strong> vastakohta?
+      {/* PLAYER UI */}
+      <div style={{ maxWidth: '400px' }}>
+        <h1>Sinä</h1>
+
+        <div style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>
+          Mikä on sanan <strong>{currentPair[0]}</strong> vastakohta?
+        </div>
+
+        <form onSubmit={handleSubmit}>
+          <input 
+            autoFocus
+            type="text" 
+            value={userInput} 
+            onChange={(e) => {
+              setUserInput(e.target.value);
+              if (status === 'wrong') setStatus('');
+            }}
+            style={{ 
+              padding: '8px', 
+              border: `2px solid ${
+                status === 'correct' ? 'green' : status === 'wrong' ? 'red' : '#ccc'
+              }`
+            }}
+          />
+          <button type="submit" style={{ marginLeft: '10px', padding: '8px 16px' }}>
+            Vastaa
+          </button>
+        </form>
+
+        <div style={{ marginTop: '10px', height: '24px' }}>
+          {status === 'correct' && <span style={{ color: 'green' }}>Oikein!</span>}
+          {status === 'wrong' && <span style={{ color: 'red' }}>Väärin.</span>}
+        </div>
+
+        <p style={{ color: '#666', fontSize: '0.8rem' }}>
+          Sana {currentIndex + 1} / {gameData.length}
+        </p>
       </div>
 
-      <form onSubmit={handleSubmit}>
-        <input 
-          autoFocus
-          type="text" 
-          value={userInput} 
-          onChange={(e) => {
-            setUserInput(e.target.value);
-            if (status === 'wrong') setStatus(''); 
-          }}
-          style={{ 
-            padding: '8px', 
-            border: `2px solid ${status === 'correct' ? 'green' : status === 'wrong' ? 'red' : '#ccc'}` 
-          }}
-        />
-        <button type="submit" style={{ marginLeft: '10px', padding: '8px 16px' }}>
-          Vastaa
-        </button>
-      </form>
+      {/* BOT UI */}
+      <div style={{ maxWidth: '400px' }}>
+        <h1>Botti</h1>
 
-      <div style={{ marginTop: '10px', height: '24px' }}>
-        {status === 'correct' && <span style={{ color: 'green' }}>Oikein!</span>}
-        {status === 'wrong' && <span style={{ color: 'red' }}>Väärin.</span>}
+        <div style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>
+          Sana: <strong>{currentPair[0]}</strong>
+        </div>
+
+        <div
+            style={{ 
+              padding: '8px', 
+              border: `2px solid ${
+                status === 'correct' ? 'green' : status === 'wrong' ? 'red' : '#ccc'
+              }`
+            }}
+        >
+          {botText}
+          <span style={{ opacity: 0.5 }}>
+            {botIndex < currentPair[1].length ? '|' : ''}
+          </span>
+        </div>
+
+        <p style={{ color: '#666', fontSize: '0.8rem' }}>
+          Nopeus: {difficulty}
+        </p>
       </div>
 
-      <p style={{ color: '#666', fontSize: '0.8rem' }}>
-        Sana {currentIndex + 1} / {gameData.length}
-      </p>
     </div>
-    
   );
 }
