@@ -99,7 +99,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   }
 
   return (
-    <div style={{ display: 'flex', gap: '40px', padding: '20px' }}>
+    <div style={{ display: 'flex', gap: '40px', paddingTop: '202px', padding: '20px' , justifyContent: 'center'}}>
       
       {/* PLAYER UI */}
       <div style={{ maxWidth: '400px' }}>

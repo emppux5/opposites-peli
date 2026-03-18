@@ -1,8 +1,8 @@
 {
-    "rikas" : "köyhä",
-    "typerä": "fiksu",
-    "iso": "pieni",
-    "kuuma": "kylmä",
-    "ylös": "alas",
-    "vasen": "oikea"
+    "rich" : "poor",
+    "dumb": "smart",
+    "big": "small",
+    "hot": "cold",
+    "up": "down",
+    "left": "right"
 }
