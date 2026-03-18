@@ -102,7 +102,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     <div style={{ display: 'flex', gap: '40px', padding: '20px' , justifyContent: 'center'}}>
       
       {/* PLAYER UI */}
-      <div style={{ maxWidth: '400px', paddingTop: '25%' }}>
+      <div style={{ maxWidth: '400px', paddingTop: '15%' }}>
         <h1>Sinä</h1>
 
         <div style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>
@@ -142,7 +142,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
       </div>
 
       {/* BOT UI */}
-      <div style={{ maxWidth: '400px', paddingTop: '25%' }}>
+      <div style={{ maxWidth: '400px', paddingTop: '15%' }}>
         <h1>Botti</h1>
 
         <div style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>
