@@ -1,10 +1,22 @@
 'use client';
 import { useState, useEffect } from 'react';
+import { useRouter } from "next/navigation";
+type Language = "fi" | "en";
 
-const difficulty = 'normal'; 
-const lang = 'fi';
+// 🍪 GET COOKIE
+function getCookie(name: string) {
+  const cookies = document.cookie.split("; ");
+  for (let c of cookies) {
+    const [key, value] = c.split("=");
+    if (key === name) return value;
+  }
+  return null;
+}
 
-const words = await import(`../../data/words.${lang}.json`).then(m => m.default);
+
+
+
+
 
 function shuffleArray<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5);
@@ -22,7 +34,41 @@ const speedMap: Record<string, number> = {
   hard: 100,
 };
 
+
 export default function GamePage() {
+
+  const router = useRouter();
+
+  const [language, setLanguage] = useState<Language>("en");
+  const [volume, setVolume] = useState(50);
+  const [difficulty, setDifficulty] = useState("normal");
+  const [words, setWords] = useState<Record<string, string>>({});
+
+  // 🔹 LUE asetukset
+  useEffect(() => {
+  const loadSettingsAndWords = async () => {
+    const langCookie = getCookie("language");
+    const vol = localStorage.getItem("volume");
+    const diff = localStorage.getItem("difficulty");
+
+    let selectedLang: Language = "en";
+
+    if (langCookie === "fi" || langCookie === "en") {
+      selectedLang = langCookie;
+      setLanguage(langCookie);
+    }
+
+    if (vol) setVolume(Number(vol));
+    if (diff) setDifficulty(diff.toLowerCase());
+
+    // ✅ load words AFTER language is known
+    const data = await import(`../../data/words.${selectedLang}.json`);
+    setWords(data.default);
+  };
+
+  loadSettingsAndWords();
+}, []);
+
   // const gameData = Object.entries(words) as [string, string][];
   const [gameData, setGameData] = useState<[string, string][]>([]);
 
@@ -34,7 +80,7 @@ export default function GamePage() {
 
   type Status = '' | 'correct' | 'wrong' | 'botWon';
   const [status, setStatus] = useState<Status>('');
-
+  
   const currentPair = gameData[currentIndex];
 
   const question = isFlipped ? currentPair?.[1] : currentPair?.[0];
@@ -43,9 +89,10 @@ export default function GamePage() {
 
 
   useEffect(() => {
-    const entries = Object.entries(words) as [string, string][];
-    setGameData(shuffleArray(entries));
-  }, []);
+      if (!words) return;
+      const entries = Object.entries(words) as [string, string][];
+      setGameData(shuffleArray(entries));
+    }, [words]);
  
   useEffect(() => {
     setIsFlipped(Math.random() < 0.5);
