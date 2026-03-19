@@ -20,9 +20,10 @@ function getCookie(name: string) {
 }
 
 export default function Options() {
-  const [volume, setVolume] = useState(50);
-  const [difficulty, setDifficulty] = useState("Normal");
-  const [language, setLanguage] = useState<Language>("en");
+  const [volume, setVolume] = useState<number | null>(null);
+  const [difficulty, setDifficulty] = useState<string | null>(null);
+  const [language, setLanguage] = useState<Language | null>(null);
+
   const [hoverBack, setHoverBack] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
 
@@ -32,26 +33,35 @@ export default function Options() {
     const storedDifficulty = localStorage.getItem("difficulty");
     const cookieLang = getCookie("language");
 
-    if (storedVolume) setVolume(Number(storedVolume));
-    if (storedDifficulty) setDifficulty(storedDifficulty);
+    setVolume(storedVolume ? Number(storedVolume) : 50);
+    setDifficulty(storedDifficulty || "Normal");
 
     if (cookieLang === "fi" || cookieLang === "en") {
       setLanguage(cookieLang);
+    } else {
+      setLanguage("en");
     }
   }, []);
 
-  // 🔹 Tallennetaan volume & difficulty edelleen localStorageen
+  // 🔹 Tallennetaan volume
   useEffect(() => {
-    localStorage.setItem("volume", volume.toString());
+    if (volume !== null) {
+      localStorage.setItem("volume", volume.toString());
+    }
   }, [volume]);
 
+  // 🔹 Tallennetaan difficulty
   useEffect(() => {
-    localStorage.setItem("difficulty", difficulty);
+    if (difficulty !== null) {
+      localStorage.setItem("difficulty", difficulty);
+    }
   }, [difficulty]);
 
-  // 🔹 Tallennetaan kieli COOKIEEN
+  // 🔹 Tallennetaan kieli cookieen
   useEffect(() => {
-    setCookie("language", language);
+    if (language) {
+      setCookie("language", language);
+    }
   }, [language]);
 
   // 🌍 Tekstit
@@ -87,6 +97,11 @@ Hot → Cold
 Big → Small`
     }
   };
+
+  // ⛔ EI RENDERÖIDÄ ENNEN KUIN DATA LADATTU
+  if (volume === null || difficulty === null || language === null) {
+    return null; // tai loading spinner
+  }
 
   return (
     <div
@@ -164,7 +179,7 @@ Big → Small`
         </select>
       </div>
 
-      {/* Info-nappi */}
+      {/* Info */}
       <button
         onClick={() => setShowInfo(!showInfo)}
         style={{
@@ -180,7 +195,6 @@ Big → Small`
         {text[language].infoBtn}
       </button>
 
-      {/* Info teksti */}
       {showInfo && (
         <div
           style={{

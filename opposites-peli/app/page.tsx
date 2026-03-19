@@ -1,27 +1,87 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useState, useEffect } from "react";
+
+type Language = "fi" | "en";
+
+// 🍪 GET COOKIE
+function getCookie(name: string) {
+  const cookies = document.cookie.split("; ");
+  for (let c of cookies) {
+    const [key, value] = c.split("=");
+    if (key === name) return value;
+  }
+  return null;
+}
 
 export default function Home() {
   const router = useRouter();
 
+  const [language, setLanguage] = useState<Language>("en");
+  const [volume, setVolume] = useState(50);
+  const [difficulty, setDifficulty] = useState("Normal");
+
+  // 🔹 LUE asetukset
+  useEffect(() => {
+    const lang = getCookie("language");
+    const vol = localStorage.getItem("volume");
+    const diff = localStorage.getItem("difficulty");
+
+    if (lang === "fi" || lang === "en") {
+      setLanguage(lang);
+    }
+
+    if (vol) setVolume(Number(vol));
+    if (diff) setDifficulty(diff);
+  }, []);
+
+  // 🌍 Tekstit
+  const text = {
+    fi: {
+      title: "Polar Opposites",
+      start: "Aloita peli",
+      options: "Asetukset",
+      volume: "Äänenvoimakkuus",
+      difficulty: "Vaikeustaso",
+    },
+    en: {
+      title: "My Game",
+      start: "Start Game",
+      options: "Options",
+      volume: "Volume",
+      difficulty: "Difficulty",
+    }
+  };
+
   return (
     <main className="flex min-h-screen items-center justify-center bg-black text-white">
       <div className="flex flex-col items-center gap-6">
-        <h1 className="text-4xl font-bold mb-8">My Game</h1>
+        
+        <h1 className="text-4xl font-bold mb-4">
+          {text[language].title}
+        </h1>
+
+        {/* 👇 Näyttää nykyiset asetukset */}
+        <p>
+          {text[language].volume}: {volume}
+        </p>
+        <p>
+          {text[language].difficulty}: {difficulty}
+        </p>
 
         <button
           onClick={() => router.push("/game")}
           className="w-48 rounded-xl bg-blue-600 py-3 text-lg hover:bg-blue-500 transition"
         >
-          Start Game
+          {text[language].start}
         </button>
 
         <button
           onClick={() => router.push("/options")}
           className="w-48 rounded-xl bg-gray-700 py-3 text-lg hover:bg-gray-600 transition"
         >
-          Options
+          {text[language].options}
         </button>
       </div>
     </main>
