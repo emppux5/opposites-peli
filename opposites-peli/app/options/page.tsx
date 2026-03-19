@@ -100,7 +100,7 @@ Big → Small`
 
   // ⛔ EI RENDERÖIDÄ ENNEN KUIN DATA LADATTU
   if (volume === null || difficulty === null || language === null) {
-    return null; // tai loading spinner
+    return null;
   }
 
   return (
@@ -122,17 +122,24 @@ Big → Small`
       </h1>
 
       {/* 🌍 LANGUAGE */}
-      <div>
-        <p style={{ fontSize: "1.5rem" }}>
+      <div style={{ textAlign: "center" }}>
+        <p style={{ fontSize: "1.5rem", fontWeight: "bold", marginBottom: "8px" }}>
           {text[language].language}
         </p>
+
         <select
           value={language}
           onChange={(e) => setLanguage(e.target.value as Language)}
           style={{
             fontSize: "1.2rem",
-            padding: "10px",
-            borderRadius: "10px"
+            padding: "12px 16px",
+            borderRadius: "10px",
+            border: "2px solid #FF6B6B",
+            backgroundColor: "#2E2E3F",
+            color: "#FFFFFF",
+            cursor: "pointer",
+            outline: "none",
+            fontWeight: "bold",
           }}
         >
           <option value="fi">Suomi</option>
