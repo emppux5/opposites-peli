@@ -2,21 +2,45 @@
 import { useState, useEffect } from "react";
 import Link from "next/link";
 
+type Language = "fi" | "en";
+
+// 🍪 SET COOKIE
+function setCookie(name: string, value: string) {
+  document.cookie = `${name}=${value}; path=/; max-age=31536000`;
+}
+
+// 🍪 GET COOKIE
+function getCookie(name: string) {
+  const cookies = document.cookie.split("; ");
+  for (let c of cookies) {
+    const [key, value] = c.split("=");
+    if (key === name) return value;
+  }
+  return null;
+}
+
 export default function Options() {
   const [volume, setVolume] = useState(50);
   const [difficulty, setDifficulty] = useState("Normal");
+  const [language, setLanguage] = useState<Language>("en");
   const [hoverBack, setHoverBack] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
 
-  // Luetaan localStoragesta kun komponentti ladataan
+  // 🔹 Ladataan asetukset
   useEffect(() => {
     const storedVolume = localStorage.getItem("volume");
     const storedDifficulty = localStorage.getItem("difficulty");
+    const cookieLang = getCookie("language");
+
     if (storedVolume) setVolume(Number(storedVolume));
     if (storedDifficulty) setDifficulty(storedDifficulty);
+
+    if (cookieLang === "fi" || cookieLang === "en") {
+      setLanguage(cookieLang);
+    }
   }, []);
 
-  // Tallennetaan muutokset localStorageen heti kun state muuttuu
+  // 🔹 Tallennetaan volume & difficulty edelleen localStorageen
   useEffect(() => {
     localStorage.setItem("volume", volume.toString());
   }, [volume]);
@@ -24,6 +48,45 @@ export default function Options() {
   useEffect(() => {
     localStorage.setItem("difficulty", difficulty);
   }, [difficulty]);
+
+  // 🔹 Tallennetaan kieli COOKIEEN
+  useEffect(() => {
+    setCookie("language", language);
+  }, [language]);
+
+  // 🌍 Tekstit
+  const text = {
+    fi: {
+      options: "Asetukset",
+      volume: "Äänenvoimakkuus",
+      difficulty: "Vaikeustaso",
+      infoBtn: showInfo ? "Piilota ohje" : "Näytä ohje",
+      back: "Takaisin",
+      language: "Kieli",
+      info: `Etsi sanan vastakohta mahdollisimman nopeasti.
+Näet ruudulla sanan.
+Tehtäväsi on kirjoittaa sen vastakohta.
+
+Esimerkki:
+Kuuma → Kylmä
+Iso → Pieni`
+    },
+    en: {
+      options: "Options",
+      volume: "Volume",
+      difficulty: "Difficulty",
+      infoBtn: showInfo ? "Hide Info" : "Show Info",
+      back: "Back",
+      language: "Language",
+      info: `Find the opposite word as quickly as possible.
+You will see a word on the screen.
+Your task is to type its opposite.
+
+Example:
+Hot → Cold
+Big → Small`
+    }
+  };
 
   return (
     <div
@@ -39,11 +102,34 @@ export default function Options() {
         gap: "30px",
       }}
     >
-      <h1 style={{ fontSize: "3rem", marginBottom: "20px" }}>Options</h1>
+      <h1 style={{ fontSize: "3rem", marginBottom: "20px" }}>
+        {text[language].options}
+      </h1>
+
+      {/* 🌍 LANGUAGE */}
+      <div>
+        <p style={{ fontSize: "1.5rem" }}>
+          {text[language].language}
+        </p>
+        <select
+          value={language}
+          onChange={(e) => setLanguage(e.target.value as Language)}
+          style={{
+            fontSize: "1.2rem",
+            padding: "10px",
+            borderRadius: "10px"
+          }}
+        >
+          <option value="fi">Suomi</option>
+          <option value="en">English</option>
+        </select>
+      </div>
 
       {/* Volume */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <p style={{ fontSize: "1.5rem" }}>Volume: {volume}</p>
+        <p style={{ fontSize: "1.5rem" }}>
+          {text[language].volume}: {volume}
+        </p>
         <input
           type="range"
           min="0"
@@ -56,7 +142,9 @@ export default function Options() {
 
       {/* Difficulty */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
-        <p style={{ fontSize: "1.5rem" }}>Difficulty</p>
+        <p style={{ fontSize: "1.5rem" }}>
+          {text[language].difficulty}
+        </p>
         <select
           value={difficulty}
           onChange={(e) => setDifficulty(e.target.value)}
@@ -87,10 +175,9 @@ export default function Options() {
           backgroundColor: "#2E2E3F",
           color: "#F0F0F0",
           cursor: "pointer",
-          transition: "0.2s",
         }}
       >
-        {showInfo ? "Hide Info" : "Show Info"}
+        {text[language].infoBtn}
       </button>
 
       {/* Info teksti */}
@@ -103,9 +190,10 @@ export default function Options() {
             borderRadius: "15px",
             textAlign: "center",
             fontSize: "1.2rem",
+            whiteSpace: "pre-line"
           }}
         >
-          ohjeet tähä
+          {text[language].info}
         </div>
       )}
 
@@ -122,10 +210,9 @@ export default function Options() {
             backgroundColor: hoverBack ? "#FF8787" : "#FF6B6B",
             color: "#F0F0F0",
             cursor: "pointer",
-            transition: "0.2s",
           }}
         >
-          Back
+          {text[language].back}
         </button>
       </Link>
     </div>
