@@ -6,6 +6,9 @@ const lang = 'fi';
 
 const words = await import(`../../data/words.${lang}.json`).then(m => m.default);
 
+function shuffleArray<T>(array: T[]): T[] {
+  return [...array].sort(() => Math.random() - 0.5);
+}
 // typing speeds (ms per character)
 const startingDelay: Record<string, number> = {
   easy: 1500,
@@ -20,28 +23,42 @@ const speedMap: Record<string, number> = {
 };
 
 export default function GamePage() {
-  const gameData = Object.entries(words) as [string, string][];
+  // const gameData = Object.entries(words) as [string, string][];
+  const [gameData, setGameData] = useState<[string, string][]>([]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [botText, setBotText] = useState('');
   const [botIndex, setBotIndex] = useState(0);
+  const [isFlipped, setIsFlipped] = useState(false);
 
   type Status = '' | 'correct' | 'wrong' | 'botWon';
   const [status, setStatus] = useState<Status>('');
 
   const currentPair = gameData[currentIndex];
+
+  const question = isFlipped ? currentPair?.[1] : currentPair?.[0];
+  const answer = isFlipped ? currentPair?.[0] : currentPair?.[1];
   const isFinished = currentIndex >= gameData.length;
 
-  // BOT TYPING EFFECT
+
+  useEffect(() => {
+    const entries = Object.entries(words) as [string, string][];
+    setGameData(shuffleArray(entries));
+  }, []);
  
+  useEffect(() => {
+    setIsFlipped(Math.random() < 0.5);
+  }, [currentIndex]);
+
+  // BOT TYPING EFFECT
 useEffect(() => {
   if (!currentPair){
     console.log("aksjdhflkasjdf")
     return;
   }
   const delay = Math.random() * startingDelay[difficulty];
-  const answer = currentPair[1];
+  const answer = isFlipped ? currentPair[0] : currentPair[1];
 
   setBotText('');
   setBotIndex(0);
@@ -68,13 +85,13 @@ useEffect(() => {
     clearTimeout(timeout);
     if (interval) clearInterval(interval);
   };
-}, [currentIndex]);
+}, [currentIndex, isFlipped]);
 
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
   if (!currentPair) return;
 
-  const [, answer] = currentPair;
+  const answer = isFlipped ? currentPair[0] : currentPair[1];
 
   if (userInput.trim().toLowerCase() === answer.toLowerCase()) {
     setStatus('correct');
@@ -93,7 +110,13 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     return (
       <div style={{ padding: '20px' }}>
         <h1>Peli loppui</h1>
-        <button onClick={() => setCurrentIndex(0)}>Pelaa uudelleen</button>
+        <button onClick={() => {
+            const entries = Object.entries(words) as [string, string][];
+            setGameData(shuffleArray(entries));
+            setCurrentIndex(0);
+          }}>
+          Pelaa uudelleen
+        </button>
       </div>
     );
   }
@@ -106,7 +129,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         <h1>Sinä</h1>
 
         <div style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>
-          Mikä on sanan <strong>{currentPair[0]}</strong> vastakohta?
+          Mikä on sanan <strong>{question}</strong> vastakohta?
         </div>
 
         <form onSubmit={handleSubmit}>
@@ -146,7 +169,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         <h1>Botti</h1>
 
         <div style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>
-          Sana: <strong>{currentPair[0]}</strong>
+          Sana: <strong>{question}</strong>
         </div>
 
         <div
@@ -159,7 +182,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         >
           {botText}
           <span style={{ opacity: 0.5 }}>
-            {botIndex < currentPair[1].length ? '|' : ''}
+            {botIndex < answer.length ? '|' : ''}
           </span>
         </div>
 
