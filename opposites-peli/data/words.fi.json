@@ -4,5 +4,10 @@
     "iso": "pieni",
     "kuuma": "kylmä",
     "ylös": "alas",
-    "vasen": "oikea"
+    "vasen": "oikea",
+    "kova": "pehmeä",
+    "pimeä": "valoisa",
+    "korkea": "matala",
+    "nopea": "hidas",
+    "vanha": "nuori"
 }
