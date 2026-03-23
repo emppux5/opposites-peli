@@ -34,6 +34,12 @@ const speedMap: Record<string, number> = {
   hard: 100,
 };
 
+const difficultyMultipliers: Record<string, number> = {
+  easy: 0.8,
+  normal: 1,
+  hard: 1.2,
+};
+
 
 export default function GamePage() {
 
@@ -43,6 +49,8 @@ export default function GamePage() {
   const [volume, setVolume] = useState(50);
   const [difficulty, setDifficulty] = useState("normal");
   const [words, setWords] = useState<Record<string, string>>({});
+  const [score, setScore] = useState(0);
+  const [multiplier, setMultiplier] = useState(1);
 
   // 🔹 LUE asetukset
   useEffect(() => {
@@ -123,6 +131,10 @@ useEffect(() => {
       if (i >= answer.length) {
         console.log("LOSER BOT WINS");
         setStatus('botWon');
+
+        setMultiplier(1);     // reset multiplier
+        setScore(prev => prev - 100); // optional penalty
+
         clearInterval(interval);
       }
     }, speedMap[difficulty]);
@@ -143,13 +155,27 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   if (userInput.trim().toLowerCase() === answer.toLowerCase()) {
     setStatus('correct');
 
+    // 🎯 Calculate points (only normal difficulty = 100 base)
+    const basePoints = difficulty === "normal" ? 100 : difficulty === "easy" ? 75 : 150; // you can customize later
+    const gainedPoints = Math.round(basePoints * multiplier);
+
+    setScore(prev => prev + gainedPoints);
+
+    // 🔼 Increase multiplier (compounding)
+    setMultiplier(prev => prev * 1.01);
+
     setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
       setUserInput('');
       setStatus('');
     }, 300);
+
   } else {
     setStatus('wrong');
+
+    // ❌ Reset multiplier and subtract points
+    setMultiplier(1);
+    setScore(prev => prev - 100);
   }
 };
 
@@ -164,7 +190,12 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
           }}>
           Pelaa uudelleen
         </button>
+<h2>Pisteet:</h2> {score}
+<div>
+<strong>Kerroin:</strong> {multiplier.toFixed(2)}x
+</div>
       </div>
+      
     );
   }
 
@@ -237,6 +268,13 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
           Nopeus: {difficulty}
         </p>
       </div>
+      <div style={{ marginTop: '10px' }}>
+  <strong>Pisteet:</strong> {score}
+</div>
+
+<div>
+  <strong>Kerroin:</strong> {multiplier.toFixed(2)}x
+</div>
 
     </div>
   );
