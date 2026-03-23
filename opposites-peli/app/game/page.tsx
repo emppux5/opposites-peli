@@ -1,7 +1,9 @@
 'use client';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef} from 'react';
 import { useRouter } from "next/navigation";
 type Language = "fi" | "en";
+
+
 
 // 🍪 GET COOKIE
 function getCookie(name: string) {
@@ -12,11 +14,6 @@ function getCookie(name: string) {
   }
   return null;
 }
-
-
-
-
-
 
 function shuffleArray<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5);
@@ -51,6 +48,7 @@ export default function GamePage() {
   const [words, setWords] = useState<Record<string, string>>({});
   const [score, setScore] = useState(0);
   const [multiplier, setMultiplier] = useState(1);
+  const inputRef = useRef<HTMLInputElement>(null);
 
   // 🔹 LUE asetukset
   useEffect(() => {
@@ -85,6 +83,8 @@ export default function GamePage() {
   const [botText, setBotText] = useState('');
   const [botIndex, setBotIndex] = useState(0);
   const [isFlipped, setIsFlipped] = useState(false);
+  const [isLocked, setIsLocked] = useState(false);
+  const [roundOver, setRoundOver] = useState(false);
 
   type Status = '' | 'correct' | 'wrong' | 'botWon';
   const [status, setStatus] = useState<Status>('');
@@ -124,18 +124,28 @@ useEffect(() => {
     let i = 0;
 
     interval = setInterval(() => {
+      if (roundOver) {
+        clearInterval(interval);
+        return;
+      }
+
       i++;
       setBotText(answer.slice(0, i));
       setBotIndex(i);
 
-      if (i >= answer.length) {
+      if (i >= answer.length && !roundOver) {
         console.log("LOSER BOT WINS");
         setStatus('botWon');
 
-        setMultiplier(1);     // reset multiplier
-        setScore(prev => prev - 100); // optional penalty
+        setMultiplier(1); 
+        setScore(prev => prev - 100);
 
         clearInterval(interval);
+
+        // ⏭️ Move to next word after delay
+        setTimeout(() => {
+          setCurrentIndex(prev => prev + 1);
+        }, 300);
       }
     }, speedMap[difficulty]);
   }, delay);
@@ -146,22 +156,50 @@ useEffect(() => {
   };
 }, [currentIndex, isFlipped]);
 
+useEffect(() => {
+  setIsLocked(false);
+  setStatus('');
+  setUserInput('');
+  setRoundOver(false); 
+}, [currentIndex]);
+
+useEffect(() => {
+  if (!isLocked && status !== 'botWon') {
+    const timeout = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }
+}, [currentIndex, isLocked, status]);
+
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
+
+  // 🚫 Block if already answered or locked
+  if (isLocked || status === 'correct' || status === 'botWon') return;
+
+  // 🚫 Block empty input
+  if (!userInput.trim()) return;
+
   if (!currentPair) return;
 
   const answer = isFlipped ? currentPair[0] : currentPair[1];
 
+  // 🔒 Lock immediately to prevent spam
+  setIsLocked(true);
+  setRoundOver(true);
+
   if (userInput.trim().toLowerCase() === answer.toLowerCase()) {
     setStatus('correct');
 
-    // 🎯 Calculate points (only normal difficulty = 100 base)
-    const basePoints = difficulty === "normal" ? 100 : difficulty === "easy" ? 75 : 150; // you can customize later
+    const basePoints =
+      difficulty === "normal" ? 100 :
+      difficulty === "easy" ? 75 : 150;
+
     const gainedPoints = Math.round(basePoints * multiplier);
 
     setScore(prev => prev + gainedPoints);
-
-    // 🔼 Increase multiplier (compounding)
     setMultiplier(prev => prev * 1.01);
 
     setTimeout(() => {
@@ -173,9 +211,11 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   } else {
     setStatus('wrong');
 
-    // ❌ Reset multiplier and subtract points
     setMultiplier(1);
     setScore(prev => prev - 100);
+
+    // 🔓 Allow retry after wrong answer (optional design choice)
+    setIsLocked(false);
   }
 };
 
@@ -211,10 +251,11 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         </div>
 
         <form onSubmit={handleSubmit}>
-          <input 
-            autoFocus
+          <input
+            ref = {inputRef} 
             type="text" 
-            value={userInput} 
+            value={userInput}
+            disabled={isLocked || status === 'botWon'}
             onChange={(e) => {
               setUserInput(e.target.value);
               if (status === 'wrong') setStatus('');
@@ -226,7 +267,11 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
               }`
             }}
           />
-          <button type="submit" style={{ marginLeft: '10px', padding: '8px 16px' }}>
+          <button 
+            type="submit"
+            disabled={isLocked || !userInput.trim() || status === 'botWon'}
+            style={{ marginLeft: '10px', padding: '8px 16px' }}
+          >
             Vastaa
           </button>
         </form>
