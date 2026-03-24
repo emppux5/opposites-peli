@@ -1,5 +1,5 @@
 "use client"
-import { useState, useEffect } from "react";
+import { useState, useEffect, useRef } from "react";
 import Link from "next/link";
 
 type Language = "fi" | "en";
@@ -27,6 +27,14 @@ export default function Options() {
 
   const [hoverBack, setHoverBack] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
+
+
+  const dingRef = useRef<HTMLAudioElement | null>(null);
+
+  useEffect(() => {
+    dingRef.current = new Audio("/sounds/bell.ogg");
+  }, []);
+
 
   // 🔹 Ladataan asetukset
   useEffect(() => {
