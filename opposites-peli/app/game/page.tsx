@@ -26,9 +26,9 @@ const startingDelay: Record<string, number> = {
 };
 
 const speedMap: Record<string, number> = {
-  easy: 300,
-  normal: 250,
-  hard: 200,
+  easy: 350,
+  normal: 300,
+  hard: 250,
 };
 
 const difficultyMultipliers: Record<string, number> = {
@@ -143,7 +143,7 @@ export default function GamePage() {
 useEffect(() => {
   if (!currentPair) return;
 
-  const delay = Math.random() * startingDelay[difficulty];
+  const delay = Math.random() * startingDelay[difficulty] + 100;
   const botAnswer = isFlipped ? currentPair[0] : currentPair[1];
 
   setBotText('');
@@ -264,7 +264,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     const isNewHighMultiplier = peakMultiplierRef.current >= highMultiplier;
 
     return (
-      <div style={{ padding: '20px', maxWidth: '420px' }}>
+      <div style={{ padding: '20px', maxWidth: '420px',justifyContent: 'center', margin: '0 auto', textAlign: 'center',paddingTop: '15%' }}>
         <h1>Peli loppui</h1>
 
         <table style={{ borderCollapse: 'collapse', width: '100%', marginBottom: '1.5rem' }}>
