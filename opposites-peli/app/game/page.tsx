@@ -1,7 +1,6 @@
 'use client';
 import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from "next/navigation";
-import test from 'node:test';
 type Language = "fi" | "en";
 
 // 🍪 GET COOKIE
