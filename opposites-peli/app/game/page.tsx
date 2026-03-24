@@ -3,6 +3,8 @@ import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from "next/navigation";
 type Language = "fi" | "en";
 
+
+
 // 🍪 GET COOKIE
 function getCookie(name: string) {
   const cookies = document.cookie.split("; ");
@@ -16,41 +18,25 @@ function getCookie(name: string) {
 function shuffleArray<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5);
 }
-
 // typing speeds (ms per character)
 const startingDelay: Record<string, number> = {
-  testing: 10000,
   easy: 1500,
   normal: 1250,
   hard: 1000,
 };
 
 const speedMap: Record<string, number> = {
-  testing: 1000,
   easy: 350,
   normal: 300,
   hard: 250,
 };
 
-// Question label per language
-const questionLabel: Record<Language, string> = {
-  fi: "Mikä on sanan",
-  en: "What is the opposite of",
-};
-const questionSuffix: Record<Language, string> = {
-  fi: "vastakohta?",
-  en: "?",
+const difficultyMultipliers: Record<string, number> = {
+  easy: 0.8,
+  normal: 1,
+  hard: 1.2,
 };
 
-// New data shape: { word: [answer1, answer2, ...] }
-type WordData = Record<string, string[]>;
-
-// Game entry: the question word + its valid answers + the bot's chosen answer this round
-type GameEntry = {
-  question: string;
-  answers: string[];    // all valid answers
-  botAnswer: string;    // randomly picked for this round
-};
 
 export default function GamePage() {
 
@@ -61,12 +47,14 @@ export default function GamePage() {
   const [difficulty, setDifficulty] = useState("normal");
   const [mode, setMode] = useState("endless");
 
+  const [words, setWords] = useState<Record<string, string>>({});
   const [score, setScore] = useState(0);
   const [multiplier, setMultiplier] = useState(1);
 
   // 🏆 High score / high multiplier — loaded from localStorage
   const [highScore, setHighScore] = useState<number>(0);
   const [highMultiplier, setHighMultiplier] = useState<number>(1);
+  // Peak multiplier reached during the current run
   const peakMultiplierRef = useRef(1);
 
   useEffect(() => {
@@ -76,46 +64,32 @@ export default function GamePage() {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // 🔹 Load settings + words
-  const [gameData, setGameData] = useState<GameEntry[]>([]);
-
+  // 🔹 LUE asetukset
   useEffect(() => {
-    const loadSettingsAndWords = async () => {
-      const langCookie = getCookie("language");
-      const vol = localStorage.getItem("volume");
-      const diff = localStorage.getItem("difficulty");
-      const savedMode = localStorage.getItem("mode");
+  const loadSettingsAndWords = async () => {
+    const langCookie = getCookie("language");
+    const vol = localStorage.getItem("volume");
+    const diff = localStorage.getItem("difficulty");
+    const mode = localStorage.getItem("mode"); // joko, peli jatkuu loputtomiin tai loppuu siihen että botti voittaa kerran
 
-      let selectedLang: Language = "en";
+    let selectedLang: Language = "en";
 
-      if (langCookie === "fi" || langCookie === "en") {
-        selectedLang = langCookie;
-        setLanguage(langCookie);
-      }
+    if (langCookie === "fi" || langCookie === "en") {
+      selectedLang = langCookie;
+      setLanguage(langCookie);
+    }
 
-      if (vol) setVolume(Number(vol));
-      if (diff) setDifficulty(diff.toLowerCase());
-      if (savedMode) setMode(savedMode);
+    if (vol) setVolume(Number(vol));
+    if (diff) setDifficulty(diff.toLowerCase());
 
-      const data = await import(`../../data/words.${selectedLang}.json`);
-      const wordData: WordData = data.default;
+    const data = await import(`../../data/words.${selectedLang}.json`);
+    setWords(data.default);
+  };
 
-      const entries = buildGameData(wordData);
-      setGameData(entries);
-    };
+  loadSettingsAndWords();
+}, []);
 
-    loadSettingsAndWords();
-  }, []);
-
-  // Build shuffled game entries, picking a random bot answer per entry
-  function buildGameData(wordData: WordData): GameEntry[] {
-    const entries: GameEntry[] = Object.entries(wordData).map(([question, answers]) => ({
-      question,
-      answers,
-      botAnswer: answers[Math.floor(Math.random() * answers.length)],
-    }));
-    return shuffleArray(entries);
-  }
+  const [gameData, setGameData] = useState<[string, string][]>([]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
@@ -125,10 +99,22 @@ export default function GamePage() {
   const [roundOver, setRoundOver] = useState(false);
   const roundOverRef = useRef(false);
 
+  // ✅ Stable flip state per index — computed synchronously, never stale
+  const flipStates = useRef<Record<number, boolean>>({});
+  const isFlipped = useMemo(() => {
+    if (flipStates.current[currentIndex] === undefined) {
+      flipStates.current[currentIndex] = Math.random() < 0.5;
+    }
+    return flipStates.current[currentIndex];
+  }, [currentIndex]);
+
   type Status = '' | 'correct' | 'wrong' | 'botWon';
   const [status, setStatus] = useState<Status>('');
+  
+  const currentPair = gameData[currentIndex];
 
-  const currentEntry = gameData[currentIndex];
+  const question = isFlipped ? currentPair?.[1] : currentPair?.[0];
+  const answer = isFlipped ? currentPair?.[0] : currentPair?.[1];
   const isFinished = currentIndex >= gameData.length && gameData.length > 0;
 
   // 🏆 Save records when game ends
@@ -147,126 +133,103 @@ export default function GamePage() {
     }
   }, [isFinished]);
 
+  useEffect(() => {
+      if (!words) return;
+      const entries = Object.entries(words) as [string, string][];
+      setGameData(shuffleArray(entries));
+    }, [words]);
+ 
   // BOT TYPING EFFECT
-  useEffect(() => {
-    if (!currentEntry) return;
+useEffect(() => {
+  if (!currentPair) return;
 
-    const delay = Math.random() * startingDelay[difficulty] + 100;
-    const botAnswer = currentEntry.botAnswer;
+  const delay = Math.random() * startingDelay[difficulty] + 100;
+  const botAnswer = isFlipped ? currentPair[0] : currentPair[1];
 
-    setBotText('');
-    setBotIndex(0);
+  setBotText('');
+  setBotIndex(0);
 
-    let interval: NodeJS.Timeout;
+  let interval: NodeJS.Timeout;
 
-    const timeout = setTimeout(() => {
-      let i = 0;
+  const timeout = setTimeout(() => {
+    let i = 0;
 
-      interval = setInterval(() => {
-        if (roundOverRef.current) {
-          clearInterval(interval);
-          return;
-        }
-
-        i++;
-        setBotText(botAnswer.slice(0, i));
-        setBotIndex(i);
-
-        if (i >= botAnswer.length && !roundOverRef.current) {
-          setStatus('botWon');
-          setMultiplier(1);
-          setScore(prev => prev - 100);
-          clearInterval(interval);
-
-          setTimeout(() => {
-            setCurrentIndex(prev => prev + 1);
-          }, 300);
-        }
-      }, speedMap[difficulty]);
-    }, delay);
-
-    return () => {
-      clearTimeout(timeout);
-      if (interval) clearInterval(interval);
-    };
-  }, [currentIndex, difficulty]);
-
-  useEffect(() => {
-    roundOverRef.current = roundOver;
-  }, [roundOver]);
-
-  useEffect(() => {
-    roundOverRef.current = false;
-    setIsLocked(false);
-    setStatus('');
-    setUserInput('');
-    setRoundOver(false);
-  }, [currentIndex]);
-
-  const dingRef = useRef<HTMLAudioElement | null>(null);
-
-  useEffect(() => {
-    dingRef.current = new Audio("/sounds/bell.ogg");
-  }, []);
-
-  useEffect(() => {
-    if (!isLocked && status !== 'botWon') {
-      const timeout = setTimeout(() => {
-        inputRef.current?.focus();
-      }, 0);
-      return () => clearTimeout(timeout);
-    }
-  }, [currentIndex, isLocked, status]);
-
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
-
-    if (isLocked || status === 'correct' || status === 'botWon') return;
-    if (!userInput.trim()) return;
-    if (!currentEntry) return;
-
-    const trimmed = userInput.trim().toLowerCase();
-    // Any valid answer counts
-    const isCorrect = currentEntry.answers.some(a => a.toLowerCase() === trimmed);
-
-    setIsLocked(true);
-    setRoundOver(true);
-
-    if (isCorrect) {
-      setStatus('correct');
-      if (dingRef.current) {
-        dingRef.current.volume = volume / 100;
-        dingRef.current.currentTime = 0;
-        dingRef.current.play().catch(err => console.log(err));
+    interval = setInterval(() => {
+      if (roundOverRef.current) {
+        clearInterval(interval);
+        return;
       }
 
-      const basePoints =
-        difficulty === "testing" ? 0 :
-        difficulty === "normal" ? 100 :
-        difficulty === "easy" ? 75 : 150;
+      i++;
+      setBotText(botAnswer.slice(0, i));
+      setBotIndex(i);
 
-      const gainedPoints = Math.round(basePoints * multiplier);
+      if (i >= botAnswer.length && !roundOverRef.current) {
+        setStatus('botWon');
+        setMultiplier(1);
+        setScore(prev => prev - 100);
+        clearInterval(interval);
 
-      setScore(prev => prev + gainedPoints);
-      setMultiplier(prev => {
-        const next = prev * 1.1;
-        peakMultiplierRef.current = Math.max(peakMultiplierRef.current, next);
-        return next;
-      });
+        setTimeout(() => {
+          setCurrentIndex(prev => prev + 1);
+        }, 300);
+      }
+    }, speedMap[difficulty]);
+  }, delay);
 
-      setTimeout(() => {
-        setCurrentIndex(prev => prev + 1);
-        setUserInput('');
-        setStatus('');
-      }, 300);
-
-    } else {
-      setStatus('wrong');
-      setMultiplier(1);
-      setScore(prev => prev - 100);
-      setIsLocked(false);
-    }
+  return () => {
+    clearTimeout(timeout);
+    if (interval) clearInterval(interval);
   };
+}, [currentIndex, isFlipped, difficulty]);
+
+useEffect(() => {
+  roundOverRef.current = roundOver;
+}, [roundOver]);
+
+useEffect(() => {
+  roundOverRef.current = false;
+  setIsLocked(false);
+  setStatus('');
+  setUserInput('');
+  setRoundOver(false); 
+}, [currentIndex]);
+
+const dingRef = useRef<HTMLAudioElement | null>(null);
+
+useEffect(() => {
+  dingRef.current = new Audio("/sounds/bell.ogg");
+}, []);
+
+useEffect(() => {
+  if (!isLocked && status !== 'botWon') {
+    const timeout = setTimeout(() => {
+      inputRef.current?.focus();
+    }, 0);
+
+    return () => clearTimeout(timeout);
+  }
+}, [currentIndex, isLocked, status]);
+
+const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+  e.preventDefault();
+
+  if (isLocked || status === 'correct' || status === 'botWon') return;
+  if (!userInput.trim()) return;
+  if (!currentPair) return;
+
+  const correctAnswer = isFlipped ? currentPair[0] : currentPair[1];
+
+  setIsLocked(true);
+  setRoundOver(true);
+
+  if (userInput.trim().toLowerCase() === correctAnswer.toLowerCase()) {
+    setStatus('correct');
+    if (dingRef.current) {
+      dingRef.current.volume = volume / 100;
+      dingRef.current.currentTime = 0;
+      dingRef.current.play().catch(err => console.log(err));
+    }
 
     const basePoints =
       difficulty === "normal" ? 100 :
@@ -341,16 +304,14 @@ const text ={
         </table>
 
         <button onClick={() => {
-          const rebuild = async () => {
-            const data = await import(`../../data/words.${language}.json`);
-            setGameData(buildGameData(data.default));
+            const entries = Object.entries(words) as [string, string][];
+            setGameData(shuffleArray(entries));
             setCurrentIndex(0);
             setScore(0);
             setMultiplier(1);
             peakMultiplierRef.current = 1;
-          };
-          rebuild();
-        }}>
+            flipStates.current = {};
+          }}>
           Pelaa uudelleen
         </button>
       </div>
@@ -358,36 +319,34 @@ const text ={
   }
 
   return (
-    <div style={{ display: 'flex', gap: '40px', padding: '20px', justifyContent: 'center' }}>
-
+    <div style={{ display: 'flex', gap: '40px', padding: '20px' , justifyContent: 'center'}}>
+      
       {/* PLAYER UI */}
       <div style={{ maxWidth: '400px', paddingTop: '15%' }}>
         <h1>Sinä</h1>
 
         <div style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>
-          {questionLabel[language]} <strong>{currentEntry?.question}</strong> {questionSuffix[language]}
+          Mikä on sanan <strong>{question}</strong> vastakohta?
         </div>
 
         <form onSubmit={handleSubmit}>
           <input
-            ref={inputRef}
-            type="text"
+            ref={inputRef} 
+            type="text" 
             value={userInput}
             disabled={isLocked || status === 'botWon'}
             onChange={(e) => {
               setUserInput(e.target.value);
               if (status === 'wrong') setStatus('');
             }}
-            style={{
-              padding: '8px',
+            style={{ 
+              padding: '8px', 
               border: `2px solid ${
-                status === 'correct' ? 'green' :
-                status === 'wrong' ? 'red' :
-                status === 'botWon' ? 'red' : '#ccc'
+                status === 'correct' ? 'green' : status === 'wrong' ? 'red' : status === 'botWon' ? 'red' : '#ccc'
               }`
             }}
           />
-          <button
+          <button 
             type="submit"
             disabled={isLocked || !userInput.trim() || status === 'botWon'}
             style={{ marginLeft: '10px', padding: '8px 16px' }}
@@ -398,16 +357,8 @@ const text ={
 
         <div style={{ marginTop: '10px', height: '24px' }}>
           {status === 'correct' && <span style={{ color: 'green' }}>Oikein!</span>}
-          {status === 'wrong' && (
-            <span style={{ color: 'red' }}>
-              Väärin. ({currentEntry?.answers.join(' / ')})
-            </span>
-          )}
-          {status === 'botWon' && (
-            <span style={{ color: 'red' }}>
-              Botti voitti! ({currentEntry?.answers.join(' / ')})
-            </span>
-          )}
+          {status === 'wrong' && <span style={{ color: 'red' }}>Väärin.</span>}
+          {status === 'botWon' && <span style={{ color: 'red' }}>Botti voitti!</span>}
         </div>
 
         <p style={{ color: '#666', fontSize: '0.8rem' }}>
@@ -420,22 +371,20 @@ const text ={
         <h1>Botti</h1>
 
         <div style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>
-          Sana: <strong>{currentEntry?.question}</strong>
+          Sana: <strong>{question}</strong>
         </div>
 
         <div
-          style={{
-            padding: '8px',
-            border: `2px solid ${
-              status === 'correct' ? 'green' :
-              status === 'wrong' ? 'red' :
-              status === 'botWon' ? 'red' : '#ccc'
-            }`
-          }}
+            style={{ 
+              padding: '8px', 
+              border: `2px solid ${
+                status === 'correct' ? 'green' : status === 'wrong' ? 'red' : status === 'botWon' ? 'red': '#ccc'
+              }`
+            }}
         >
           {botText}
           <span style={{ opacity: 0.5 }}>
-            {currentEntry && botIndex < currentEntry.botAnswer.length ? '|' : ''}
+            {answer && botIndex < answer.length ? '|' : ''}
           </span>
         </div>
 
