@@ -268,45 +268,7 @@ export default function GamePage() {
     }
   };
 
-    const basePoints =
-      difficulty === "normal" ? 100 :
-      difficulty === "easy" ? 75 : 150;
-
-    const gainedPoints = Math.round(basePoints * multiplier);
-
-    setScore(prev => prev + gainedPoints);
-    setMultiplier(prev => {
-      const next = prev * 1.1;
-      // Track peak multiplier for this run
-      peakMultiplierRef.current = Math.max(peakMultiplierRef.current, next);
-      return next;
-    });
-
-    setTimeout(() => {
-      setCurrentIndex(prev => prev + 1);
-      setUserInput('');
-      setStatus('');
-    }, 300);
-
-  } else {
-    setStatus('wrong');
-    setMultiplier(1);
-    setScore(prev => prev - 100);
-    setIsLocked(false);
-  }
-};
-
-const text ={
-  fi: {
-
-  },
-  en: {
-
-  }
-}
-
-// ui ----------------------------------------------------
-  if (isFinished) {
+    if (isFinished) {
     const isNewHighScore = score >= highScore;
     const isNewHighMultiplier = peakMultiplierRef.current >= highMultiplier;
 
@@ -458,5 +420,4 @@ const text ={
 
     </div>
   );
-// ui loppu ----------------------------------------------------
 }
