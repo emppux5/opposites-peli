@@ -259,6 +259,16 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   }
 };
 
+const text ={
+  fi: {
+
+  },
+  en: {
+
+  }
+}
+
+// ui ----------------------------------------------------
   if (isFinished) {
     const isNewHighScore = score >= highScore;
     const isNewHighMultiplier = peakMultiplierRef.current >= highMultiplier;
@@ -397,4 +407,5 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 
     </div>
   );
+// ui loppu ----------------------------------------------------
 }
