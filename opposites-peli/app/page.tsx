@@ -52,7 +52,7 @@ export default function Home() {
       mode: "Pelimuoto",
     },
     en: {
-      title: "My Game",
+      title: "Polar Opposites",
       start: "Start Game",
       options: "Options",
       volume: "Volume",
