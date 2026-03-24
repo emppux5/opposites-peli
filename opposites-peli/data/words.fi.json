@@ -1,6 +1,6 @@
 {
     "rikas" : "köyhä",
-    "typerä": "fiksu",
+    "tyhmä": "fiksu",
     "iso": "pieni",
     "kuuma": "kylmä",
     "ylös": "alas",
@@ -9,5 +9,19 @@
     "pimeä": "valoisa",
     "korkea": "matala",
     "nopea": "hidas",
-    "vanha": "nuori"
+    "vanha": "nuori",
+    "raskas": "kevyt",
+    "kallis": "halpa",
+    "puhdas": "likainen",
+    "kaunis": "ruma",
+    "vahva": "heikko",
+    "helppo": "vaikea",
+    "pitkä": "lyhyt",
+    "onnellinen": "surullinen",
+    "täysi": "tyhjä",
+    "voittaja": "häviäjä",
+    "päivä": "yö",
+    "alku": "loppu",
+    "hyvä": "huono",
+    "talvi": "kesä"
 }
