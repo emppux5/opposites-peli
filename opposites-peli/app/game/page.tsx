@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef} from 'react';
+import { useState, useEffect, useRef, useMemo } from 'react';
 import { useRouter } from "next/navigation";
 type Language = "fi" | "en";
 
@@ -21,14 +21,14 @@ function shuffleArray<T>(array: T[]): T[] {
 // typing speeds (ms per character)
 const startingDelay: Record<string, number> = {
   easy: 1500,
-  normal: 1000,
-  hard: 500,
+  normal: 1250,
+  hard: 1000,
 };
 
 const speedMap: Record<string, number> = {
   easy: 300,
-  normal: 200,
-  hard: 100,
+  normal: 250,
+  hard: 200,
 };
 
 const difficultyMultipliers: Record<string, number> = {
@@ -45,6 +45,8 @@ export default function GamePage() {
   const [language, setLanguage] = useState<Language>("en");
   const [volume, setVolume] = useState(50);
   const [difficulty, setDifficulty] = useState("normal");
+  const [mode, setMode] = useState("endless"); // "endless" tai "challenge"
+
   const [words, setWords] = useState<Record<string, string>>({});
   const [score, setScore] = useState(0);
   const [multiplier, setMultiplier] = useState(1);
@@ -56,6 +58,7 @@ export default function GamePage() {
     const langCookie = getCookie("language");
     const vol = localStorage.getItem("volume");
     const diff = localStorage.getItem("difficulty");
+    const mode = localStorage.getItem("mode"); // joko, peli jatkuu loputtomiin tai loppuu siihen että botti voittaa kerran
 
     let selectedLang: Language = "en";
 
@@ -67,7 +70,6 @@ export default function GamePage() {
     if (vol) setVolume(Number(vol));
     if (diff) setDifficulty(diff.toLowerCase());
 
-    // ✅ load words AFTER language is known
     const data = await import(`../../data/words.${selectedLang}.json`);
     setWords(data.default);
   };
@@ -75,16 +77,24 @@ export default function GamePage() {
   loadSettingsAndWords();
 }, []);
 
-  // const gameData = Object.entries(words) as [string, string][];
   const [gameData, setGameData] = useState<[string, string][]>([]);
 
   const [currentIndex, setCurrentIndex] = useState(0);
   const [userInput, setUserInput] = useState('');
   const [botText, setBotText] = useState('');
   const [botIndex, setBotIndex] = useState(0);
-  const [isFlipped, setIsFlipped] = useState(false);
   const [isLocked, setIsLocked] = useState(false);
   const [roundOver, setRoundOver] = useState(false);
+  const roundOverRef = useRef(false);
+
+  // ✅ Stable flip state per index — computed synchronously, never stale
+  const flipStates = useRef<Record<number, boolean>>({});
+  const isFlipped = useMemo(() => {
+    if (flipStates.current[currentIndex] === undefined) {
+      flipStates.current[currentIndex] = Math.random() < 0.5;
+    }
+    return flipStates.current[currentIndex];
+  }, [currentIndex]);
 
   type Status = '' | 'correct' | 'wrong' | 'botWon';
   const [status, setStatus] = useState<Status>('');
@@ -102,18 +112,13 @@ export default function GamePage() {
       setGameData(shuffleArray(entries));
     }, [words]);
  
-  useEffect(() => {
-    setIsFlipped(Math.random() < 0.5);
-  }, [currentIndex]);
-
   // BOT TYPING EFFECT
+  // ✅ isFlipped is now stable before this runs — no race condition
 useEffect(() => {
-  if (!currentPair){
-    console.log("aksjdhflkasjdf")
-    return;
-  }
+  if (!currentPair) return;
+
   const delay = Math.random() * startingDelay[difficulty];
-  const answer = isFlipped ? currentPair[0] : currentPair[1];
+  const botAnswer = isFlipped ? currentPair[0] : currentPair[1];
 
   setBotText('');
   setBotIndex(0);
@@ -124,25 +129,21 @@ useEffect(() => {
     let i = 0;
 
     interval = setInterval(() => {
-      if (roundOver) {
+      if (roundOverRef.current) {
         clearInterval(interval);
         return;
       }
 
       i++;
-      setBotText(answer.slice(0, i));
+      setBotText(botAnswer.slice(0, i));
       setBotIndex(i);
 
-      if (i >= answer.length && !roundOver) {
-        console.log("LOSER BOT WINS");
+      if (i >= botAnswer.length && !roundOverRef.current) {
         setStatus('botWon');
-
         setMultiplier(1); 
         setScore(prev => prev - 100);
-
         clearInterval(interval);
 
-        // ⏭️ Move to next word after delay
         setTimeout(() => {
           setCurrentIndex(prev => prev + 1);
         }, 300);
@@ -154,14 +155,25 @@ useEffect(() => {
     clearTimeout(timeout);
     if (interval) clearInterval(interval);
   };
-}, [currentIndex, isFlipped]);
+}, [currentIndex, isFlipped, difficulty]);
 
 useEffect(() => {
+  roundOverRef.current = roundOver;
+}, [roundOver]);
+
+useEffect(() => {
+  roundOverRef.current = false;
   setIsLocked(false);
   setStatus('');
   setUserInput('');
   setRoundOver(false); 
 }, [currentIndex]);
+
+const dingRef = useRef<HTMLAudioElement | null>(null);
+
+useEffect(() => {
+  dingRef.current = new Audio("/sounds/bell.ogg");
+}, []);
 
 useEffect(() => {
   if (!isLocked && status !== 'botWon') {
@@ -176,22 +188,22 @@ useEffect(() => {
 const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
   e.preventDefault();
 
-  // 🚫 Block if already answered or locked
   if (isLocked || status === 'correct' || status === 'botWon') return;
-
-  // 🚫 Block empty input
   if (!userInput.trim()) return;
-
   if (!currentPair) return;
 
-  const answer = isFlipped ? currentPair[0] : currentPair[1];
+  const correctAnswer = isFlipped ? currentPair[0] : currentPair[1];
 
-  // 🔒 Lock immediately to prevent spam
   setIsLocked(true);
   setRoundOver(true);
 
-  if (userInput.trim().toLowerCase() === answer.toLowerCase()) {
+  if (userInput.trim().toLowerCase() === correctAnswer.toLowerCase()) {
     setStatus('correct');
+    if (dingRef.current) {
+      dingRef.current.volume = volume / 100;
+      dingRef.current.currentTime = 0; // restart sound
+      dingRef.current.play().catch(err => console.log(err));
+    }
 
     const basePoints =
       difficulty === "normal" ? 100 :
@@ -200,7 +212,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     const gainedPoints = Math.round(basePoints * multiplier);
 
     setScore(prev => prev + gainedPoints);
-    setMultiplier(prev => prev * 1.01);
+    setMultiplier(prev => prev * 1.1);
 
     setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
@@ -210,11 +222,8 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 
   } else {
     setStatus('wrong');
-
     setMultiplier(1);
     setScore(prev => prev - 100);
-
-    // 🔓 Allow retry after wrong answer (optional design choice)
     setIsLocked(false);
   }
 };
@@ -227,15 +236,15 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
             const entries = Object.entries(words) as [string, string][];
             setGameData(shuffleArray(entries));
             setCurrentIndex(0);
+            flipStates.current = {}; // ✅ Clear flip cache on restart
           }}>
           Pelaa uudelleen
         </button>
-<h2>Pisteet:</h2> {score}
-<div>
-<strong>Kerroin:</strong> {multiplier.toFixed(2)}x
-</div>
+        <h2>Pisteet:</h2> {score}
+        <div>
+          <strong>Kerroin:</strong> {multiplier.toFixed(2)}x
+        </div>
       </div>
-      
     );
   }
 
@@ -252,7 +261,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 
         <form onSubmit={handleSubmit}>
           <input
-            ref = {inputRef} 
+            ref={inputRef} 
             type="text" 
             value={userInput}
             disabled={isLocked || status === 'botWon'}
@@ -305,7 +314,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         >
           {botText}
           <span style={{ opacity: 0.5 }}>
-            {botIndex < answer.length ? '|' : ''}
+            {answer && botIndex < answer.length ? '|' : ''}
           </span>
         </div>
 
@@ -313,13 +322,14 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
           Nopeus: {difficulty}
         </p>
       </div>
-      <div style={{ marginTop: '10px' }}>
-  <strong>Pisteet:</strong> {score}
-</div>
 
-<div>
-  <strong>Kerroin:</strong> {multiplier.toFixed(2)}x
-</div>
+      <div style={{ marginTop: '10px' }}>
+        <strong>Pisteet:</strong> {score}
+      </div>
+
+      <div>
+        <strong>Kerroin:</strong> {multiplier.toFixed(2)}x
+      </div>
 
     </div>
   );

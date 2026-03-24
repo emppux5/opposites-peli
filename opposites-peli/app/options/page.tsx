@@ -23,6 +23,7 @@ export default function Options() {
   const [volume, setVolume] = useState<number | null>(null);
   const [difficulty, setDifficulty] = useState<string | null>(null);
   const [language, setLanguage] = useState<Language | null>(null);
+  const [mode, setMode] = useState<string | null>(null); // joko, peli jatkuu loputtomiin tai loppuu siihen että botti voittaa kerran (endless tai challenge)
 
   const [hoverBack, setHoverBack] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
@@ -32,9 +33,11 @@ export default function Options() {
     const storedVolume = localStorage.getItem("volume");
     const storedDifficulty = localStorage.getItem("difficulty");
     const cookieLang = getCookie("language");
+    const storedMode = localStorage.getItem("mode"); // joko, peli jatkuu loputtomiin tai loppuu siihen että botti voittaa kerran
 
     setVolume(storedVolume ? Number(storedVolume) : 50);
     setDifficulty(storedDifficulty || "Normal");
+    setMode(storedMode || "endless");
 
     if (cookieLang === "fi" || cookieLang === "en") {
       setLanguage(cookieLang);
@@ -64,12 +67,19 @@ export default function Options() {
     }
   }, [language]);
 
+  useEffect(() => {
+    if (mode) {
+      localStorage.setItem("mode", mode);
+    }
+  }, [mode]);
+
   // 🌍 Tekstit
   const text = {
     fi: {
       options: "Asetukset",
       volume: "Äänenvoimakkuus",
       difficulty: "Vaikeustaso",
+      mode: "Pelimuoto",
       infoBtn: showInfo ? "Piilota ohje" : "Näytä ohje",
       back: "Takaisin",
       language: "Kieli",
@@ -83,6 +93,7 @@ Iso → Pieni`
     },
     en: {
       options: "Options",
+      mode: "Game Mode",
       volume: "Volume",
       difficulty: "Difficulty",
       infoBtn: showInfo ? "Hide Info" : "Show Info",
@@ -183,6 +194,29 @@ Big → Small`
           <option>Easy</option>
           <option>Normal</option>
           <option>Hard</option>
+        </select>
+      </div>
+
+      {/* Mode */}
+      <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
+        <p style={{ fontSize: "1.5rem" }}>
+          {text[language].mode}
+        </p>
+        <select
+          value={mode}
+          onChange={(e) => setMode(e.target.value)}
+          style={{
+            fontSize: "1.2rem",
+            padding: "10px 20px",
+            borderRadius: "10px",
+            border: "2px solid #FF6B6B",
+            backgroundColor: "#2E2E3F",
+            color: "#F0F0F0",
+            cursor: "pointer",
+          }}
+        >
+          <option>Endless</option>
+          <option>Challenge</option>
         </select>
       </div>
 

@@ -21,12 +21,16 @@ export default function Home() {
   const [language, setLanguage] = useState<Language>("en");
   const [volume, setVolume] = useState(50);
   const [difficulty, setDifficulty] = useState("Normal");
+  const [mode, setMode] = useState("endless"); // "endless" tai "challenge"
+
 
   // 🔹 LUE asetukset
   useEffect(() => {
     const lang = getCookie("language");
     const vol = localStorage.getItem("volume");
     const diff = localStorage.getItem("difficulty");
+    const mode = localStorage.getItem("mode"); // joko, peli jatkuu loputtomiin tai loppuu siihen että botti voittaa kerran
+
 
     if (lang === "fi" || lang === "en") {
       setLanguage(lang);
@@ -34,6 +38,7 @@ export default function Home() {
 
     if (vol) setVolume(Number(vol));
     if (diff) setDifficulty(diff);
+    if (mode) setMode(mode);
   }, []);
 
   // 🌍 Tekstit
@@ -44,6 +49,7 @@ export default function Home() {
       options: "Asetukset",
       volume: "Äänenvoimakkuus",
       difficulty: "Vaikeustaso",
+      mode: "Pelimuoto",
     },
     en: {
       title: "My Game",
@@ -51,6 +57,7 @@ export default function Home() {
       options: "Options",
       volume: "Volume",
       difficulty: "Difficulty",
+      mode: "Game Mode",
     }
   };
 
@@ -68,6 +75,9 @@ export default function Home() {
         </p>
         <p>
           {text[language].difficulty}: {difficulty}
+        </p>
+        <p>
+          {text[language].mode}: {mode}
         </p>
 
         <button
