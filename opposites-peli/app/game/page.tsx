@@ -269,12 +269,12 @@ export default function GamePage() {
     }
   };
 
-  if (isFinished) {
+    if (isFinished) {
     const isNewHighScore = score >= highScore;
     const isNewHighMultiplier = peakMultiplierRef.current >= highMultiplier;
 
     return (
-      <div style={{ padding: '20px', maxWidth: '420px' }}>
+      <div style={{ padding: '20px', maxWidth: '420px',justifyContent: 'center', margin: '0 auto', textAlign: 'center',paddingTop: '15%' }}>
         <h1>Peli loppui</h1>
 
         <table style={{ borderCollapse: 'collapse', width: '100%', marginBottom: '1.5rem' }}>
@@ -304,7 +304,6 @@ export default function GamePage() {
         </table>
 
         <button onClick={() => {
-          // Re-import words to rebuild with fresh random bot answers
           const rebuild = async () => {
             const data = await import(`../../data/words.${language}.json`);
             setGameData(buildGameData(data.default));
