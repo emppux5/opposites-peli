@@ -1,5 +1,78 @@
 {
-    "oikea": ["väärä", "vasen"],
-    "vasen": ["oikea"],
-    "väärä": ["oikea", "totta"]
+  "rikas": ["köyhä", "varakas"],
+  "köyhä": ["rikas", "vähävarainen"],
+
+  "tyhmä": ["fiksu", "älykäs"],
+  "fiksu": ["tyhmä", "typerä"],
+  "älykäs": ["tyhmä", "typerä"],
+
+  "iso": ["pieni", "suuri"],
+  "suuri": ["pieni", "iso"],
+  "pieni": ["iso", "suuri"],
+
+  "kuuma": ["kylmä", "viileä"],
+  "kylmä": ["kuuma", "lämmin"],
+
+  "ylös": ["alas"],
+  "alas": ["ylös"],
+
+  "vasen": ["oikea"],
+  "oikea": ["vasen", "väärä"],
+
+  "kova": ["pehmeä", "hellä"],
+  "pehmeä": ["kova", "karkea"],
+
+  "pimeä": ["valoisa", "kirkas"],
+  "valoisa": ["pimeä", "synkkä"],
+
+  "korkea": ["matala"],
+  "matala": ["korkea"],
+
+  "nopea": ["hidas"],
+  "hidas": ["nopea", "vikkelä"],
+
+  "vanha": ["nuori"],
+  "nuori": ["vanha", "ikäinen", "vanhus"],
+
+  "raskas": ["kevyt"],
+  "kevyt": ["raskas", "painava"],
+
+  "kallis": ["halpa"],
+  "halpa": ["kallis"],
+
+  "puhdas": ["likainen"],
+  "likainen": ["puhdas"],
+
+  "kaunis": ["ruma"],
+  "ruma": ["kaunis"],
+
+  "vahva": ["heikko"],
+  "heikko": ["vahva"],
+
+  "helppo": ["vaikea"],
+  "vaikea": ["helppo"],
+
+  "pitkä": ["lyhyt"],
+  "lyhyt": ["pitkä"],
+
+  "onnellinen": ["surullinen"],
+  "surullinen": ["onnellinen"],
+
+  "täysi": ["tyhjä"],
+  "tyhjä": ["täysi"],
+
+  "voittaja": ["häviäjä"],
+  "häviäjä": ["voittaja"],
+
+  "päivä": ["yö"],
+  "yö": ["päivä"],
+
+  "alku": ["loppu"],
+  "loppu": ["alku"],
+
+  "hyvä": ["huono"],
+  "huono": ["hyvä"],
+
+  "talvi": ["kesä"],
+  "kesä": ["talvi"]
 }
