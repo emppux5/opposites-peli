@@ -221,6 +221,7 @@ Big → Small`,
             cursor: "pointer",
           }}
         >
+          <option>Testing</option>
           <option>Easy</option>
           <option>Normal</option>
           <option>Hard</option>
