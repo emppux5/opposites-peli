@@ -23,11 +23,10 @@ export default function Options() {
   const [volume, setVolume] = useState<number | null>(null);
   const [difficulty, setDifficulty] = useState<string | null>(null);
   const [language, setLanguage] = useState<Language | null>(null);
-  const [mode, setMode] = useState<string | null>(null); // joko, peli jatkuu loputtomiin tai loppuu siihen että botti voittaa kerran (endless tai challenge)
+  const [mode, setMode] = useState<string | null>(null);
 
   const [hoverBack, setHoverBack] = useState(false);
   const [showInfo, setShowInfo] = useState(false);
-
 
   const dingRef = useRef<HTMLAudioElement | null>(null);
 
@@ -35,13 +34,21 @@ export default function Options() {
     dingRef.current = new Audio("/sounds/bell.ogg");
   }, []);
 
+  // 🔊 TEST SOUND FUNCTION
+  const playTestSound = () => {
+    if (dingRef.current && volume !== null) {
+      dingRef.current.volume = volume / 100;
+      dingRef.current.currentTime = 0;
+      dingRef.current.play();
+    }
+  };
 
   // 🔹 Ladataan asetukset
   useEffect(() => {
     const storedVolume = localStorage.getItem("volume");
     const storedDifficulty = localStorage.getItem("difficulty");
     const cookieLang = getCookie("language");
-    const storedMode = localStorage.getItem("mode"); // joko, peli jatkuu loputtomiin tai loppuu siihen että botti voittaa kerran
+    const storedMode = localStorage.getItem("mode");
 
     setVolume(storedVolume ? Number(storedVolume) : 50);
     setDifficulty(storedDifficulty || "Normal");
@@ -81,7 +88,6 @@ export default function Options() {
     }
   }, [mode]);
 
-  // 🌍 Tekstit
   const text = {
     fi: {
       options: "Asetukset",
@@ -117,7 +123,6 @@ Big → Small`
     }
   };
 
-  // ⛔ EI RENDERÖIDÄ ENNEN KUIN DATA LADATTU
   if (volume === null || difficulty === null || language === null) {
     return null;
   }
@@ -166,11 +171,11 @@ Big → Small`
         </select>
       </div>
 
-      {/* Volume */}
       <div style={{ display: "flex", flexDirection: "column", alignItems: "center" }}>
         <p style={{ fontSize: "1.5rem" }}>
           {text[language].volume}: {volume}
         </p>
+
         <input
           type="range"
           min="0"
@@ -179,6 +184,21 @@ Big → Small`
           onChange={(e) => setVolume(Number(e.target.value))}
           style={{ width: "300px", height: "10px", accentColor: "#FF6B6B" }}
         />
+        <button
+          onClick={playTestSound}
+          style={{
+            marginTop: "15px",
+            fontSize: "1rem",
+            padding: "10px 20px",
+            borderRadius: "10px",
+            border: "2px solid #FF6B6B",
+            backgroundColor: "#2E2E3F",
+            color: "#F0F0F0",
+            cursor: "pointer",
+          }}
+        >
+          Test Sound 🔊
+        </button>
       </div>
 
       {/* Difficulty */}
