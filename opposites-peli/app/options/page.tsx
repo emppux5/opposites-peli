@@ -103,7 +103,8 @@ Tehtäväsi on kirjoittaa sen vastakohta.
 
 Esimerkki:
 Kuuma → Kylmä
-Iso → Pieni`
+Iso → Pieni`,
+      soundbutton: "Testaa ääni"
     },
     en: {
       options: "Options",
@@ -119,7 +120,8 @@ Your task is to type its opposite.
 
 Example:
 Hot → Cold
-Big → Small`
+Big → Small`,
+      soundbutton: "Test Sound"
     }
   };
 
@@ -197,7 +199,7 @@ Big → Small`
             cursor: "pointer",
           }}
         >
-          Test Sound 🔊
+          {text[language].soundbutton}
         </button>
       </div>
 
