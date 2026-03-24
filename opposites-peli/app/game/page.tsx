@@ -45,11 +45,23 @@ export default function GamePage() {
   const [language, setLanguage] = useState<Language>("en");
   const [volume, setVolume] = useState(50);
   const [difficulty, setDifficulty] = useState("normal");
-  const [mode, setMode] = useState("endless"); // "endless" tai "challenge"
+  const [mode, setMode] = useState("endless");
 
   const [words, setWords] = useState<Record<string, string>>({});
   const [score, setScore] = useState(0);
   const [multiplier, setMultiplier] = useState(1);
+
+  // 🏆 High score / high multiplier — loaded from localStorage
+  const [highScore, setHighScore] = useState<number>(0);
+  const [highMultiplier, setHighMultiplier] = useState<number>(1);
+  // Peak multiplier reached during the current run
+  const peakMultiplierRef = useRef(1);
+
+  useEffect(() => {
+    setHighScore(Number(localStorage.getItem('highScore') ?? 0));
+    setHighMultiplier(Number(localStorage.getItem('highMultiplier') ?? 1));
+  }, []);
+
   const inputRef = useRef<HTMLInputElement>(null);
 
   // 🔹 LUE asetukset
@@ -103,8 +115,23 @@ export default function GamePage() {
 
   const question = isFlipped ? currentPair?.[1] : currentPair?.[0];
   const answer = isFlipped ? currentPair?.[0] : currentPair?.[1];
-  const isFinished = currentIndex >= gameData.length;
+  const isFinished = currentIndex >= gameData.length && gameData.length > 0;
 
+  // 🏆 Save records when game ends
+  useEffect(() => {
+    if (!isFinished) return;
+
+    if (score > highScore) {
+      setHighScore(score);
+      localStorage.setItem('highScore', String(score));
+    }
+
+    const peak = peakMultiplierRef.current;
+    if (peak > highMultiplier) {
+      setHighMultiplier(peak);
+      localStorage.setItem('highMultiplier', String(peak));
+    }
+  }, [isFinished]);
 
   useEffect(() => {
       if (!words) return;
@@ -113,7 +140,6 @@ export default function GamePage() {
     }, [words]);
  
   // BOT TYPING EFFECT
-  // ✅ isFlipped is now stable before this runs — no race condition
 useEffect(() => {
   if (!currentPair) return;
 
@@ -140,7 +166,7 @@ useEffect(() => {
 
       if (i >= botAnswer.length && !roundOverRef.current) {
         setStatus('botWon');
-        setMultiplier(1); 
+        setMultiplier(1);
         setScore(prev => prev - 100);
         clearInterval(interval);
 
@@ -201,7 +227,7 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     setStatus('correct');
     if (dingRef.current) {
       dingRef.current.volume = volume / 100;
-      dingRef.current.currentTime = 0; // restart sound
+      dingRef.current.currentTime = 0;
       dingRef.current.play().catch(err => console.log(err));
     }
 
@@ -212,7 +238,12 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
     const gainedPoints = Math.round(basePoints * multiplier);
 
     setScore(prev => prev + gainedPoints);
-    setMultiplier(prev => prev * 1.1);
+    setMultiplier(prev => {
+      const next = prev * 1.1;
+      // Track peak multiplier for this run
+      peakMultiplierRef.current = Math.max(peakMultiplierRef.current, next);
+      return next;
+    });
 
     setTimeout(() => {
       setCurrentIndex(prev => prev + 1);
@@ -229,21 +260,50 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
 };
 
   if (isFinished) {
+    const isNewHighScore = score >= highScore;
+    const isNewHighMultiplier = peakMultiplierRef.current >= highMultiplier;
+
     return (
-      <div style={{ padding: '20px' }}>
+      <div style={{ padding: '20px', maxWidth: '420px' }}>
         <h1>Peli loppui</h1>
+
+        <table style={{ borderCollapse: 'collapse', width: '100%', marginBottom: '1.5rem' }}>
+          <thead>
+            <tr style={{ borderBottom: '2px solid #ccc' }}>
+              <th style={{ textAlign: 'left', padding: '6px 12px' }}></th>
+              <th style={{ textAlign: 'right', padding: '6px 12px' }}>Tulos</th>
+              <th style={{ textAlign: 'right', padding: '6px 12px' }}>Ennätys</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td style={{ padding: '6px 12px' }}>Pisteet</td>
+              <td style={{ padding: '6px 12px', textAlign: 'right', fontWeight: 'bold', color: isNewHighScore ? '#c8a800' : 'inherit' }}>
+                {score}{isNewHighScore ? ' 🏆' : ''}
+              </td>
+              <td style={{ padding: '6px 12px', textAlign: 'right', color: '#888' }}>{highScore}</td>
+            </tr>
+            <tr>
+              <td style={{ padding: '6px 12px' }}>Kerroin</td>
+              <td style={{ padding: '6px 12px', textAlign: 'right', fontWeight: 'bold', color: isNewHighMultiplier ? '#c8a800' : 'inherit' }}>
+                {peakMultiplierRef.current.toFixed(2)}x{isNewHighMultiplier ? ' 🏆' : ''}
+              </td>
+              <td style={{ padding: '6px 12px', textAlign: 'right', color: '#888' }}>{highMultiplier.toFixed(2)}x</td>
+            </tr>
+          </tbody>
+        </table>
+
         <button onClick={() => {
             const entries = Object.entries(words) as [string, string][];
             setGameData(shuffleArray(entries));
             setCurrentIndex(0);
-            flipStates.current = {}; // ✅ Clear flip cache on restart
+            setScore(0);
+            setMultiplier(1);
+            peakMultiplierRef.current = 1;
+            flipStates.current = {};
           }}>
           Pelaa uudelleen
         </button>
-        <h2>Pisteet:</h2> {score}
-        <div>
-          <strong>Kerroin:</strong> {multiplier.toFixed(2)}x
-        </div>
       </div>
     );
   }
@@ -323,12 +383,16 @@ const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
         </p>
       </div>
 
-      <div style={{ marginTop: '10px' }}>
-        <strong>Pisteet:</strong> {score}
-      </div>
-
-      <div>
-        <strong>Kerroin:</strong> {multiplier.toFixed(2)}x
+      {/* SCORE UI */}
+      <div style={{ paddingTop: '15%' }}>
+        <div style={{ marginBottom: '8px' }}>
+          <strong>Pisteet:</strong> {score}
+          <div style={{ color: '#888', fontSize: '0.8rem' }}>Ennätys: {highScore}</div>
+        </div>
+        <div>
+          <strong>Kerroin:</strong> {multiplier.toFixed(2)}x
+          <div style={{ color: '#888', fontSize: '0.8rem' }}>Ennätys: {highMultiplier.toFixed(2)}x</div>
+        </div>
       </div>
 
     </div>
