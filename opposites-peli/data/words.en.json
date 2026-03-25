@@ -1,29 +1,36 @@
 {
-  "rich": ["poor", "wealthy"],
-  "poor": ["rich", "low income"],
+  "rich": ["poor", "needy", "impoverished"],
+  "poor": ["rich", "wealthy", "affluent"],
+  "wealthy": ["poor", "impoverished"],
 
-  "stupid": ["smart", "intelligent"],
-  "smart": ["stupid", "foolish"],
-  "intelligent": ["stupid", "foolish"],
+  "stupid": ["smart", "intelligent", "wise", "clever"],
+  "smart": ["stupid", "dumb", "foolish"],
+  "intelligent": ["stupid", "ignorant"],
+  "wise": ["stupid", "foolish"],
 
-  "big": ["small", "large"],
-  "large": ["small", "big"],
-  "small": ["big", "large"],
+  "big": ["small", "tiny"],
+  "small": ["big", "large", "huge"],
+  "large": ["small", "tiny"],
 
-  "hot": ["cold", "cool"],
+  "hot": ["cold", "cool", "lukewarm"],
   "cold": ["hot", "warm"],
+  "warm": ["cold", "cool"],
 
   "up": ["down"],
   "down": ["up"],
 
   "left": ["right"],
   "right": ["left", "wrong"],
+  "wrong": ["right", "correct"],
 
   "hard": ["soft", "gentle"],
   "soft": ["hard", "rough"],
+  "rough": ["smooth", "soft"],
+  "smooth": ["rough"],
 
   "dark": ["bright", "light"],
-  "bright": ["dark", "gloomy"],
+  "bright": ["dark", "dim"],
+  "dim": ["bright"],
 
   "high": ["low"],
   "low": ["high"],
@@ -31,13 +38,14 @@
   "fast": ["slow"],
   "slow": ["fast", "quick"],
 
-  "old": ["young"],
-  "young": ["old", "aged", "elderly"],
+  "old": ["young", "new"],
+  "young": ["old", "aged"],
+  "new": ["old"],
 
   "heavy": ["light"],
-  "light": ["heavy", ""],
+  "light": ["heavy"],
 
-  "expensive": ["cheap"],
+  "expensive": ["cheap", "affordable"],
   "cheap": ["expensive"],
 
   "clean": ["dirty"],
@@ -49,30 +57,69 @@
   "strong": ["weak"],
   "weak": ["strong"],
 
-  "easy": ["difficult"],
+  "easy": ["difficult", "hard"],
   "difficult": ["easy"],
 
   "long": ["short"],
   "short": ["long"],
 
-  "happy": ["sad"],
+  "wide": ["narrow"],
+  "narrow": ["wide"],
+
+  "happy": ["sad", "unhappy"],
   "sad": ["happy"],
 
   "full": ["empty"],
   "empty": ["full"],
 
-  "winner": ["loser"],
-  "loser": ["winner"],
-
-  "day": ["night"],
-  "night": ["day"],
-
-  "beginning": ["end"],
-  "end": ["beginning"],
-
   "good": ["bad"],
   "bad": ["good"],
 
-  "winter": ["summer"],
-  "summer": ["winter"]
+  "wet": ["dry"],
+  "dry": ["wet"],
+
+  "open": ["closed"],
+  "closed": ["open"],
+
+  "truth": ["lie", "falsehood"],
+  "lie": ["truth"],
+
+  "friend": ["enemy"],
+  "enemy": ["friend"],
+
+  "love": ["hate"],
+  "hate": ["love"],
+
+  "give": ["take"],
+  "take": ["give"],
+
+  "buy": ["sell"],
+  "sell": ["buy"],
+
+  "come": ["go"],
+  "go": ["come"],
+
+  "inside": ["outside"],
+  "outside": ["inside"],
+
+  "more": ["less"],
+  "less": ["more"],
+
+  "always": ["never", "rarely"],
+  "never": ["always"],
+
+  "possible": ["impossible"],
+  "impossible": ["possible"],
+
+  "safe": ["dangerous"],
+  "dangerous": ["safe"],
+
+  "simple": ["complex"],
+  "complex": ["simple"],
+
+  "order": ["chaos"],
+  "chaos": ["order"],
+
+  "peace": ["war"],
+  "war": ["peace"]
 }
