@@ -1,27 +1,78 @@
 {
-    "rich": "poor",
-    "stupid": "smart",
-    "big": "small",
-    "hot": "cold",
-    "up": "down",
-    "left": "right",
-    "hard": "soft",
-    "dark": "bright",
-    "high": "low",
-    "fast": "slow",
-    "old": "young",
-    "heavy": "light",
-    "expensive": "cheap",
-    "clean": "dirty",
-    "beautiful": "ugly",
-    "strong": "weak",
-    "easy": "difficult",
-    "long": "short",
-    "happy": "sad",
-    "full": "empty",
-    "winner": "loser",
-    "day": "night",
-    "beginning": "end",
-    "good": "bad",
-    "winter": "summer"
+  "rich": ["poor", "wealthy"],
+  "poor": ["rich", "low income"],
+
+  "stupid": ["smart", "intelligent"],
+  "smart": ["stupid", "foolish"],
+  "intelligent": ["stupid", "foolish"],
+
+  "big": ["small", "large"],
+  "large": ["small", "big"],
+  "small": ["big", "large"],
+
+  "hot": ["cold", "cool"],
+  "cold": ["hot", "warm"],
+
+  "up": ["down"],
+  "down": ["up"],
+
+  "left": ["right"],
+  "right": ["left", "wrong"],
+
+  "hard": ["soft", "gentle"],
+  "soft": ["hard", "rough"],
+
+  "dark": ["bright", "light"],
+  "bright": ["dark", "gloomy"],
+
+  "high": ["low"],
+  "low": ["high"],
+
+  "fast": ["slow"],
+  "slow": ["fast", "quick"],
+
+  "old": ["young"],
+  "young": ["old", "aged", "elderly"],
+
+  "heavy": ["light"],
+  "light": ["heavy", ""],
+
+  "expensive": ["cheap"],
+  "cheap": ["expensive"],
+
+  "clean": ["dirty"],
+  "dirty": ["clean"],
+
+  "beautiful": ["ugly"],
+  "ugly": ["beautiful"],
+
+  "strong": ["weak"],
+  "weak": ["strong"],
+
+  "easy": ["difficult"],
+  "difficult": ["easy"],
+
+  "long": ["short"],
+  "short": ["long"],
+
+  "happy": ["sad"],
+  "sad": ["happy"],
+
+  "full": ["empty"],
+  "empty": ["full"],
+
+  "winner": ["loser"],
+  "loser": ["winner"],
+
+  "day": ["night"],
+  "night": ["day"],
+
+  "beginning": ["end"],
+  "end": ["beginning"],
+
+  "good": ["bad"],
+  "bad": ["good"],
+
+  "winter": ["summer"],
+  "summer": ["winter"]
 }
