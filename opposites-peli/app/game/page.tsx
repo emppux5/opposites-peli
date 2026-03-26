@@ -1,5 +1,5 @@
 'use client';
-import { useState, useEffect, useRef, useMemo } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { useRouter } from "next/navigation";
 type Language = "fi" | "en";
 
@@ -25,9 +25,9 @@ const startingDelay: Record<string, number> = {
 };
 
 const speedMap: Record<string, number> = {
-  easy: 350,
-  normal: 300,
-  hard: 250,
+  easy: 2000, 
+  normal: 500,  
+  hard: 300,    
 };
 
 // Question label per language
@@ -149,45 +149,45 @@ export default function GamePage() {
   useEffect(() => {
     if (!currentEntry) return;
 
-    const delay = Math.random() * startingDelay[difficulty] + 100;
     const botAnswer = currentEntry.botAnswer;
+    const wordLength = botAnswer.length;
 
+    // Base delay before typing
+    let baseDelay = Math.random() * startingDelay[difficulty];
+    // Delay per character
+    let charDelay = speedMap[difficulty];
+
+    let iRef = { current: 0 };
     setBotText('');
     setBotIndex(0);
+    roundOverRef.current = false;
 
-    let interval: NodeJS.Timeout;
-
-    const timeout = setTimeout(() => {
-      let i = 0;
-
-      interval = setInterval(() => {
-        if (roundOverRef.current) {
-          clearInterval(interval);
-          return;
-        }
-
-        i++;
-        setBotText(botAnswer.slice(0, i));
-        setBotIndex(i);
-
-        if (i >= botAnswer.length && !roundOverRef.current) {
+    const typeChar = () => {
+      if (roundOverRef.current || iRef.current >= wordLength) {
+        if (!roundOverRef.current) {
           setStatus('botWon');
           setMultiplier(1);
           setScore(prev => prev - 100);
-          clearInterval(interval);
-
-          setTimeout(() => {
-            setCurrentIndex(prev => prev + 1);
-          }, 300);
+          setTimeout(() => setCurrentIndex(prev => prev + 1), 300);
         }
-      }, speedMap[difficulty]);
-    }, delay);
+        return;
+      }
+
+      iRef.current += 1;
+      setBotText(botAnswer.slice(0, iRef.current));
+      setBotIndex(iRef.current);
+
+      setTimeout(typeChar, charDelay);
+    };
+
+    const startTimeout = setTimeout(typeChar, baseDelay);
 
     return () => {
-      clearTimeout(timeout);
-      if (interval) clearInterval(interval);
+      clearTimeout(startTimeout);
+      roundOverRef.current = true;
     };
-  }, [currentIndex, difficulty]);
+
+  }, [currentEntry, difficulty]);
 
   useEffect(() => {
     roundOverRef.current = roundOver;
@@ -265,7 +265,7 @@ export default function GamePage() {
     }
   };
 
-    if (isFinished) {
+  if (isFinished) {
     const isNewHighScore = score >= highScore;
     const isNewHighMultiplier = peakMultiplierRef.current >= highMultiplier;
 
