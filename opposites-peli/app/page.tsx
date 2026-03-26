@@ -45,7 +45,7 @@ export default function Home() {
   // 🌍 Tekstit
   const text = {
     fi: {
-      title: "Polar Opposites",
+      title: "Word Opposites",
       start: "Aloita peli",
       options: "Asetukset",
       volume: "Äänenvoimakkuus",
@@ -53,7 +53,7 @@ export default function Home() {
       mode: "Pelimuoto",
     },
     en: {
-      title: "Polar Opposites",
+      title: "Word Opposites",
       start: "Start Game",
       options: "Options",
       volume: "Volume",
