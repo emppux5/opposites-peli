@@ -1,6 +1,6 @@
 /** @type {import('next').NextConfig} */
 const nextConfig = {
-  output: 'export', // pakottaa staattisen buildin
+  // Ei output: 'export'
 }
 
 module.exports = nextConfig
