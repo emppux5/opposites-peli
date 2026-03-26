@@ -3,7 +3,6 @@ import { useState, useEffect, useRef } from 'react';
 import { useRouter } from "next/navigation";
 type Language = "fi" | "en";
 
-// 🍪 GET COOKIE
 function getCookie(name: string) {
   const cookies = document.cookie.split("; ");
   for (let c of cookies) {
@@ -30,7 +29,6 @@ const speedMap: Record<string, number> = {
   hard: 250,    
 };
 
-// Question label per language
 const questionLabel: Record<Language, string> = {
   fi: "Mikä on sanan",
   en: "What is the opposite of",
@@ -90,14 +88,12 @@ const ui: Record<Language, {
   },
 };
 
-// New data shape: { word: [answer1, answer2, ...] }
 type WordData = Record<string, string[]>;
 
-// Game entry: the question word + its valid answers + the bot's chosen answer this round
 type GameEntry = {
   question: string;
-  answers: string[];    // all valid answers
-  botAnswer: string;    // randomly picked for this round
+  answers: string[];    
+  botAnswer: string;    
 };
 
 export default function GamePage() {
@@ -112,7 +108,6 @@ export default function GamePage() {
   const [score, setScore] = useState(0);
   const [multiplier, setMultiplier] = useState(1);
 
-  // 🏆 High score / high multiplier — loaded from localStorage
   const [highScore, setHighScore] = useState<number>(0);
   const [highMultiplier, setHighMultiplier] = useState<number>(1);
   const peakMultiplierRef = useRef(1);
@@ -124,7 +119,6 @@ export default function GamePage() {
 
   const inputRef = useRef<HTMLInputElement>(null);
 
-  // 🔹 Load settings + words
   const [gameData, setGameData] = useState<GameEntry[]>([]);
 
   useEffect(() => {
@@ -155,7 +149,6 @@ export default function GamePage() {
     loadSettingsAndWords();
   }, []);
 
-  // Build shuffled game entries, picking a random bot answer per entry
   function buildGameData(wordData: WordData): GameEntry[] {
     const entries: GameEntry[] = Object.entries(wordData).map(([question, answers]) => ({
       question,
@@ -179,7 +172,6 @@ export default function GamePage() {
   const currentEntry = gameData[currentIndex];
   const isFinished = currentIndex >= gameData.length && gameData.length > 0;
 
-  // 🏆 Save records when game ends
   useEffect(() => {
     if (!isFinished) return;
 
@@ -195,11 +187,9 @@ export default function GamePage() {
     }
   }, [isFinished]);
 
-// BOT TYPING EFFECT
 useEffect(() => {
   if (!currentEntry) return;
 
-  // ✅ Snapshot the answer at effect start — prevents stale closure
   const botAnswer = currentEntry.botAnswer;
   const wordLength = botAnswer.length;
 
@@ -211,12 +201,11 @@ useEffect(() => {
   setBotIndex(0);
   roundOverRef.current = false;
 
-  let cancelled = false; // ✅ Local cancel flag instead of shared ref
+  let cancelled = false;
 
   const typeChar = () => {
       if (cancelled || iRef.current >= wordLength) {
         if (!cancelled) {
-          // If the player already answered this round, don't advance — player wins the tie
           if (roundOverRef.current) return;
           setStatus('botWon');
           setMultiplier(1);
@@ -237,7 +226,7 @@ useEffect(() => {
   const startTimeout = setTimeout(typeChar, baseDelay);
 
   return () => {
-    cancelled = true; // ✅ Cancel this effect's chain, not the shared ref
+    cancelled = true;
     clearTimeout(startTimeout);
   };
 
@@ -278,7 +267,6 @@ useEffect(() => {
     if (!currentEntry) return;
 
     const trimmed = userInput.trim().toLowerCase();
-    // Any valid answer counts
     const isCorrect = currentEntry.answers.some(a => a.toLowerCase() === trimmed);
 
     setIsLocked(true);

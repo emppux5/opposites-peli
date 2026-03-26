@@ -5,7 +5,6 @@ import { useState, useEffect } from "react";
 
 type Language = "fi" | "en";
 
-// 🍪 GET COOKIE
 function getCookie(name: string) {
   const cookies = document.cookie.split("; ");
   for (let c of cookies) {
@@ -21,10 +20,9 @@ export default function Home() {
   const [language, setLanguage] = useState<Language>("en");
   const [volume, setVolume] = useState(50);
   const [difficulty, setDifficulty] = useState("Normal");
-  const [mode, setMode] = useState("endless"); // "endless" tai "challenge"
+  const [mode, setMode] = useState("endless"); 
 
 
-  // 🔹 LUE asetukset
   useEffect(() => {
     const lang = getCookie("language");
     const vol = localStorage.getItem("volume");
@@ -42,7 +40,6 @@ export default function Home() {
     if (mode) setMode(mode);
   }, []);
 
-  // 🌍 Tekstit
   const text = {
     fi: {
       title: "Word Opposites",
@@ -70,7 +67,6 @@ export default function Home() {
           {text[language].title}
         </h1>
 
-        {/* 👇 Näyttää nykyiset asetukset */}
         <p>
           {text[language].volume}: {volume}
         </p>

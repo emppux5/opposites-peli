@@ -123,7 +123,6 @@ export default function Options() {
     fontWeight: "bold"
   };
 
-  // ✅ Improved select style (clear + visible)
   const selectStyle: React.CSSProperties = {
     minWidth: "180px",
     padding: "10px 12px",
