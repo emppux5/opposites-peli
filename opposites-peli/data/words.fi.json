@@ -1,18 +1,18 @@
 {
-  "rikas": ["köyhä", "varaton", "vähävarainen"],
-  "köyhä": ["rikas", "varakas", "hyvinvoiva", "rikkas"],
-  "varakas": ["köyhä", "varaton", "vähävarainen"],
+  "rikas": ["köyhä", "varaton", "vähävarainen", "rahapulassa", "puutteellinen"],
+  "köyhä": ["rikas", "varakas", "hyvinvoiva", "vauras"],
+  "varakas": ["köyhä", "varaton", "vähävarainen", "vähäosainen"],
 
-  "tyhmä": ["fiksu", "älykäs", "viisas", "nerokas"],
-  "fiksu": ["tyhmä", "typerä", "hölmö"],
-  "älykäs": ["tyhmä", "typerä", "yksinkertainen"],
-  "viisas": ["tyhmä", "hölmö", "ajattelematon"],
+  "tyhmä": ["fiksu", "älykäs", "viisas", "nerokas", "terävä"],
+  "fiksu": ["tyhmä", "typerä", "hölmö", "yksinkertainen"],
+  "älykäs": ["tyhmä", "typerä", "yksinkertainen", "ymmärtämätön"],
+  "viisas": ["tyhmä", "hölmö", "ajattelematon", "ymmärtämätön"],
 
-  "iso": ["pieni", "vähäinen"],
-  "pieni": ["iso", "suuri", "valtava"],
-  "suuri": ["pieni", "mitätön"],
+  "iso": ["pieni", "vähäinen", "mitätön"],
+  "pieni": ["iso", "suuri", "valtava", "massiivinen"],
+  "suuri": ["pieni", "mitätön", "vähäinen"],
 
-  "kuuma": ["kylmä", "viileä", "haalea"],
+  "kuuma": ["kylmä", "viileä", "haalea", "jäinen"],
   "kylmä": ["kuuma", "lämmin", "kuumahtava"],
   "lämmin": ["kylmä", "viileä", "jäinen"],
 
@@ -21,59 +21,59 @@
 
   "vasen": ["oikea"],
   "oikea": ["vasen", "väärä", "epätosi"],
-  "väärä": ["oikea", "totta", "korrekti"],
+  "väärä": ["oikea", "totta", "paikkansapitävä"],
 
-  "kova": ["pehmeä", "hellä", "lempeä"],
-  "pehmeä": ["kova", "karkea", "kovakourainen"],
+  "kova": ["pehmeä", "hellä", "lempeä", "notkea"],
+  "pehmeä": ["kova", "karkea", "kovakourainen", "jäykkä"],
   "karkea": ["pehmeä", "sileä", "hieno"],
-  "sileä": ["karkea", "karhea"],
+  "sileä": ["karkea", "karhea", "epätasainen"],
 
   "pimeä": ["valoisa", "kirkas", "valaistu"],
   "valoisa": ["pimeä", "synkkä", "hämärä"],
-  "samea": ["kirkas", "selkeä"],
+  "samea": ["kirkas", "selkeä", "läpikuultava"],
 
-  "korkea": ["matala", "alhainen"],
+  "korkea": ["matala", "alhainen", "lyhyt"],
   "matala": ["korkea", "korkeatasoinen"],
 
-  "nopea": ["hidas", "verkkaisa"],
+  "nopea": ["hidas", "verkkaisa", "hidasliikkeinen"],
   "hidas": ["nopea", "vikkelä", "nopealiikkeinen"],
 
-  "vanha": ["nuori", "uusi", "tuore"],
-  "nuori": ["vanha", "ikäinen", "iäkäs"],
-  "uusi": ["vanha", "kulunut"],
+  "vanha": ["nuori", "uusi", "tuore", "moderni"],
+  "nuori": ["vanha", "iäkäs", "ikäntynyt"],
+  "uusi": ["vanha", "kulunut", "käytetty"],
 
-  "raskas": ["kevyt", "painoton"],
+  "raskas": ["kevyt", "painoton", "kevyttekoinen"],
   "kevyt": ["raskas", "painava", "raskastekoinen"],
 
-  "kallis": ["halpa", "edullinen"],
-  "halpa": ["kallis", "arvokas"],
+  "kallis": ["halpa", "edullinen", "huokea"],
+  "halpa": ["kallis", "arvokas", "hintava"],
 
-  "puhdas": ["likainen", "saastainen"],
-  "likainen": ["puhdas", "siisti"],
+  "puhdas": ["likainen", "saastainen", "tahrainen"],
+  "likainen": ["puhdas", "siisti", "puhdistettu"],
 
-  "kaunis": ["ruma", "epäkaunis"],
-  "ruma": ["kaunis", "viehättävä"],
+  "kaunis": ["ruma", "epäkaunis", "rumahtava"],
+  "ruma": ["kaunis", "viehättävä", "kaunokainen"],
 
-  "vahva": ["heikko", "voimaton"],
-  "heikko": ["vahva", "voimakas"],
+  "vahva": ["heikko", "voimaton", "hento"],
+  "heikko": ["vahva", "voimakas", "kestävä"],
 
-  "helppo": ["vaikea", "haastava"],
-  "vaikea": ["helppo", "yksinkertainen"],
+  "helppo": ["vaikea", "haastava", "työläs"],
+  "vaikea": ["helppo", "yksinkertainen", "vaivaton"],
 
   "pitkä": ["lyhyt", "lyhyehkö"],
   "lyhyt": ["pitkä", "pitkäkestoinen"],
 
-  "onnellinen": ["surullinen", "onneton"],
-  "surullinen": ["onnellinen", "iloinen"],
+  "onnellinen": ["surullinen", "onneton", "murheellinen"],
+  "surullinen": ["onnellinen", "iloinen", "riemukas"],
 
   "täysi": ["tyhjä", "vajaa"],
-  "tyhjä": ["täysi", "täynnä"],
+  "tyhjä": ["täysi", "täynnä", "täytetty"],
 
-  "hyvä": ["huono", "kehno"],
-  "huono": ["hyvä", "erinomainen"],
+  "hyvä": ["huono", "kehno", "paha"],
+  "huono": ["hyvä", "erinomainen", "loistava"],
 
   "märkä": ["kuiva", "rutikuiva"],
-  "kuiva": ["märkä", "kostea"],
+  "kuiva": ["märkä", "kostea", "nihkeä"],
 
   "avoin": ["suljettu", "kiinni"],
   "suljettu": ["avoin", "auki"],
@@ -81,48 +81,48 @@
   "valo": ["pimeys", "pimeä"],
   "pimeys": ["valo", "valoisuus"],
 
-  "totuus": ["valhe", "epätotuus"],
-  "valhe": ["totuus", "fakta"],
+  "totuus": ["valhe", "epätotuus", "harha"],
+  "valhe": ["totuus", "fakta", "tosiasia"],
 
-  "ystävä": ["vihollinen", "vastustaja"],
-  "vihollinen": ["ystävä", "liittolainen"],
+  "ystävä": ["vihollinen", "vastustaja", "vihamies"],
+  "vihollinen": ["ystävä", "liittolainen", "kumppani"],
 
-  "rakastaa": ["vihata", "inhota"],
-  "vihata": ["rakastaa", "pitää"],
+  "rakastaa": ["vihata", "inhota", "halveksia"],
+  "vihata": ["rakastaa", "pitää", "välittää"],
 
-  "antaa": ["ottaa", "riistää"],
-  "ottaa": ["antaa", "luovuttaa"],
+  "antaa": ["ottaa", "riistää", "varastaa"],
+  "ottaa": ["antaa", "luovuttaa", "antaa pois"],
 
   "ostaa": ["myydä", "luopua"],
   "myydä": ["ostaa", "hankkia"],
 
-  "tulla": ["mennä", "lähteä"],
+  "tulla": ["mennä", "lähteä", "poistua"],
   "mennä": ["tulla", "saapua"],
 
   "sisällä": ["ulkona", "ulos"],
   "ulkona": ["sisällä", "sisään"],
 
   "enemmän": ["vähemmän", "niukemmin"],
-  "vähemmän": ["enemmän", "paljon"],
+  "vähemmän": ["enemmän", "enempi", "runsaammin"],
 
-  "aina": ["ei koskaan", "harvoin"],
+  "aina": ["ei koskaan", "harvoin", "satunnaisesti"],
   "ei koskaan": ["aina", "usein"],
 
   "mahdollinen": ["mahdoton", "epätodennäköinen"],
-  "mahdoton": ["mahdollinen", "toteutettavissa"],
+  "mahdoton": ["mahdollinen", "toteutettavissa", "realistinen"],
 
-  "turvallinen": ["vaarallinen", "riskialtis"],
-  "vaarallinen": ["turvallinen", "harmiton"],
+  "turvallinen": ["vaarallinen", "riskialtis", "turvaton"],
+  "vaarallinen": ["turvallinen", "harmiton", "vaaraton"],
 
-  "yksinkertainen": ["monimutkainen", "sekava"],
-  "monimutkainen": ["yksinkertainen", "selkeä"],
+  "yksinkertainen": ["monimutkainen", "sekava", "vaikea"],
+  "monimutkainen": ["yksinkertainen", "selkeä", "helppo"],
 
-  "järjestys": ["kaaos", "sekasorto"],
-  "kaaos": ["järjestys", "organisaatio"],
+  "järjestys": ["kaaos", "sekasorto", "epäjärjestys"],
+  "kaaos": ["järjestys", "organisaatio", "järjestäytyneisyys"],
 
-  "rakkaus": ["viha", "inho"],
-  "viha": ["rakkaus", "kiintymys"],
+  "rakkaus": ["viha", "inho", "halveksunta"],
+  "viha": ["rakkaus", "kiintymys", "välittäminen"],
 
-  "rauha": ["sota", "konflikti"],
-  "sota": ["rauha", "sovinto"]
+  "rauha": ["sota", "konflikti", "levottomuus"],
+  "sota": ["rauha", "sovinto", "aselepo"]
 }

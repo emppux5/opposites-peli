@@ -30,6 +30,7 @@ export default function Home() {
     const vol = localStorage.getItem("volume");
     const diff = localStorage.getItem("difficulty");
     const mode = localStorage.getItem("mode"); // joko, peli jatkuu loputtomiin tai loppuu siihen että botti voittaa kerran
+    // rn ei tee mitään
 
 
     if (lang === "fi" || lang === "en") {
@@ -76,10 +77,11 @@ export default function Home() {
         <p>
           {text[language].difficulty}: {difficulty}
         </p>
+        {/*
         <p>
           {text[language].mode}: {mode}
         </p>
-
+        */}
         <button
           onClick={() => router.push("/game")}
           className="w-48 rounded-xl bg-blue-600 py-3 text-lg hover:bg-blue-500 transition"

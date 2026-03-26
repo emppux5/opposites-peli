@@ -17,17 +17,17 @@ function shuffleArray<T>(array: T[]): T[] {
   return [...array].sort(() => Math.random() - 0.5);
 }
 
-// typing speeds (ms per character)
+
 const startingDelay: Record<string, number> = {
-  easy: 1500,
-  normal: 1250,
+  easy: 2000,
+  normal: 1500,
   hard: 1000,
 };
 
 const speedMap: Record<string, number> = {
-  easy: 2000, 
+  easy: 1500, 
   normal: 500,  
-  hard: 300,    
+  hard: 250,    
 };
 
 // Question label per language
@@ -38,6 +38,56 @@ const questionLabel: Record<Language, string> = {
 const questionSuffix: Record<Language, string> = {
   fi: "vastakohta?",
   en: "?",
+};
+
+const ui: Record<Language, {
+  you: string;
+  bot: string;
+  answer: string;
+  correct: string;
+  wrong: string;
+  botWon: string;
+  word: string;
+  speed: string;
+  points: string;
+  record: string;
+  multiplier: string;
+  gameOver: string;
+  result: string;
+  playAgain: string;
+}> = {
+  fi: {
+    you: "Sinä",
+    bot: "Botti",
+    answer: "Vastaa",
+    correct: "Oikein!",
+    wrong: "Väärin.",
+    botWon: "Botti voitti!",
+    word: "Sana",
+    speed: "Nopeus",
+    points: "Pisteet",
+    record: "Ennätys",
+    multiplier: "Kerroin",
+    gameOver: "Peli loppui",
+    result: "Tulos",
+    playAgain: "Pelaa uudelleen",
+  },
+  en: {
+    you: "You",
+    bot: "Bot",
+    answer: "Answer",
+    correct: "Correct!",
+    wrong: "Wrong.",
+    botWon: "Bot won!",
+    word: "Word",
+    speed: "Speed",
+    points: "Points",
+    record: "Record",
+    multiplier: "Multiplier",
+    gameOver: "Game over",
+    result: "Score",
+    playAgain: "Play again",
+  },
 };
 
 // New data shape: { word: [answer1, answer2, ...] }
@@ -145,49 +195,53 @@ export default function GamePage() {
     }
   }, [isFinished]);
 
-  // BOT TYPING EFFECT
-  useEffect(() => {
-    if (!currentEntry) return;
+// BOT TYPING EFFECT
+useEffect(() => {
+  if (!currentEntry) return;
 
-    const botAnswer = currentEntry.botAnswer;
-    const wordLength = botAnswer.length;
+  // ✅ Snapshot the answer at effect start — prevents stale closure
+  const botAnswer = currentEntry.botAnswer;
+  const wordLength = botAnswer.length;
 
-    // Base delay before typing
-    let baseDelay = Math.random() * startingDelay[difficulty];
-    // Delay per character
-    let charDelay = speedMap[difficulty];
+  let baseDelay = Math.random() * startingDelay[difficulty] + 200;
+  let charDelay = speedMap[difficulty];
 
-    let iRef = { current: 0 };
-    setBotText('');
-    setBotIndex(0);
-    roundOverRef.current = false;
+  let iRef = { current: 0 };
+  setBotText('');
+  setBotIndex(0);
+  roundOverRef.current = false;
 
-    const typeChar = () => {
-      if (roundOverRef.current || iRef.current >= wordLength) {
-        if (!roundOverRef.current) {
+  let cancelled = false; // ✅ Local cancel flag instead of shared ref
+
+  const typeChar = () => {
+      if (cancelled || iRef.current >= wordLength) {
+        if (!cancelled) {
+          // If the player already answered this round, don't advance — player wins the tie
+          if (roundOverRef.current) return;
           setStatus('botWon');
           setMultiplier(1);
           setScore(prev => prev - 100);
+          roundOverRef.current = true;
           setTimeout(() => setCurrentIndex(prev => prev + 1), 300);
         }
         return;
       }
 
-      iRef.current += 1;
-      setBotText(botAnswer.slice(0, iRef.current));
-      setBotIndex(iRef.current);
+    iRef.current += 1;
+    setBotText(botAnswer.slice(0, iRef.current));
+    setBotIndex(iRef.current);
 
-      setTimeout(typeChar, charDelay);
-    };
+    setTimeout(typeChar, charDelay);
+  };
 
-    const startTimeout = setTimeout(typeChar, baseDelay);
+  const startTimeout = setTimeout(typeChar, baseDelay);
 
-    return () => {
-      clearTimeout(startTimeout);
-      roundOverRef.current = true;
-    };
+  return () => {
+    cancelled = true; // ✅ Cancel this effect's chain, not the shared ref
+    clearTimeout(startTimeout);
+  };
 
-  }, [currentEntry, difficulty]);
+}, [currentEntry, difficulty]);
 
   useEffect(() => {
     roundOverRef.current = roundOver;
@@ -229,6 +283,7 @@ export default function GamePage() {
 
     setIsLocked(true);
     setRoundOver(true);
+    roundOverRef.current = true;
 
     if (isCorrect) {
       setStatus('correct');
@@ -270,27 +325,27 @@ export default function GamePage() {
     const isNewHighMultiplier = peakMultiplierRef.current >= highMultiplier;
 
     return (
-      <div style={{ padding: '20px', maxWidth: '420px',justifyContent: 'center', margin: '0 auto', textAlign: 'center',paddingTop: '15%' }}>
-        <h1>Peli loppui</h1>
+      <div style={{ padding: '20px', maxWidth: '420px', justifyContent: 'center', margin: '0 auto', textAlign: 'center', paddingTop: '15%' }}>
+        <h1>{ui[language].gameOver}</h1>
 
         <table style={{ borderCollapse: 'collapse', width: '100%', marginBottom: '1.5rem' }}>
           <thead>
             <tr style={{ borderBottom: '2px solid #ccc' }}>
               <th style={{ textAlign: 'left', padding: '6px 12px' }}></th>
-              <th style={{ textAlign: 'right', padding: '6px 12px' }}>Tulos</th>
-              <th style={{ textAlign: 'right', padding: '6px 12px' }}>Ennätys</th>
+              <th style={{ textAlign: 'right', padding: '6px 12px' }}>{ui[language].result}</th>
+              <th style={{ textAlign: 'right', padding: '6px 12px' }}>{ui[language].record}</th>
             </tr>
           </thead>
           <tbody>
             <tr>
-              <td style={{ padding: '6px 12px' }}>Pisteet</td>
+              <td style={{ padding: '6px 12px' }}>{ui[language].points}</td>
               <td style={{ padding: '6px 12px', textAlign: 'right', fontWeight: 'bold', color: isNewHighScore ? '#c8a800' : 'inherit' }}>
                 {score}{isNewHighScore ? ' 🏆' : ''}
               </td>
               <td style={{ padding: '6px 12px', textAlign: 'right', color: '#888' }}>{highScore}</td>
             </tr>
             <tr>
-              <td style={{ padding: '6px 12px' }}>Kerroin</td>
+              <td style={{ padding: '6px 12px' }}>{ui[language].multiplier}</td>
               <td style={{ padding: '6px 12px', textAlign: 'right', fontWeight: 'bold', color: isNewHighMultiplier ? '#c8a800' : 'inherit' }}>
                 {peakMultiplierRef.current.toFixed(2)}x{isNewHighMultiplier ? ' 🏆' : ''}
               </td>
@@ -310,7 +365,7 @@ export default function GamePage() {
           };
           rebuild();
         }}>
-          Pelaa uudelleen
+          {ui[language].playAgain}
         </button>
       </div>
     );
@@ -321,7 +376,7 @@ export default function GamePage() {
 
       {/* PLAYER UI */}
       <div style={{ maxWidth: '400px', paddingTop: '15%' }}>
-        <h1>Sinä</h1>
+        <h1>{ui[language].you}</h1>
 
         <div style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>
           {questionLabel[language]} <strong>{currentEntry?.question}</strong> {questionSuffix[language]}
@@ -351,35 +406,35 @@ export default function GamePage() {
             disabled={isLocked || !userInput.trim() || status === 'botWon'}
             style={{ marginLeft: '10px', padding: '8px 16px' }}
           >
-            Vastaa
+            {ui[language].answer}
           </button>
         </form>
 
         <div style={{ marginTop: '10px', height: '24px' }}>
-          {status === 'correct' && <span style={{ color: 'green' }}>Oikein!</span>}
+          {status === 'correct' && <span style={{ color: 'green' }}>{ui[language].correct}</span>}
           {status === 'wrong' && (
             <span style={{ color: 'red' }}>
-              Väärin. ({currentEntry?.answers.join(' / ')})
+              {ui[language].wrong} ({currentEntry?.answers.join(' / ')})
             </span>
           )}
           {status === 'botWon' && (
             <span style={{ color: 'red' }}>
-              Botti voitti! ({currentEntry?.answers.join(' / ')})
+              {ui[language].botWon} ({currentEntry?.answers.join(' / ')})
             </span>
           )}
         </div>
 
         <p style={{ color: '#666', fontSize: '0.8rem' }}>
-          Sana {currentIndex + 1} / {gameData.length}
+          {ui[language].word} {currentIndex + 1} / {gameData.length}
         </p>
       </div>
 
       {/* BOT UI */}
       <div style={{ width: '200px', paddingTop: '15%' }}>
-        <h1>Botti</h1>
+        <h1>{ui[language].bot}</h1>
 
         <div style={{ marginBottom: '1rem', fontSize: '1.2rem' }}>
-          Sana: <strong>{currentEntry?.question}</strong>
+          {ui[language].word}: <strong>{currentEntry?.question}</strong>
         </div>
 
         <div
@@ -399,19 +454,19 @@ export default function GamePage() {
         </div>
 
         <p style={{ color: '#666', fontSize: '0.8rem' }}>
-          Nopeus: {difficulty}
+          {ui[language].speed}: {difficulty}
         </p>
       </div>
 
       {/* SCORE UI */}
       <div style={{ paddingTop: '15%' }}>
         <div style={{ marginBottom: '8px' }}>
-          <strong>Pisteet:</strong> {score}
-          <div style={{ color: '#888', fontSize: '0.8rem' }}>Ennätys: {highScore}</div>
+          <strong>{ui[language].points}:</strong> {score}
+          <div style={{ color: '#888', fontSize: '0.8rem' }}>{ui[language].record}: {highScore}</div>
         </div>
         <div>
-          <strong>Kerroin:</strong> {multiplier.toFixed(2)}x
-          <div style={{ color: '#888', fontSize: '0.8rem' }}>Ennätys: {highMultiplier.toFixed(2)}x</div>
+          <strong>{ui[language].multiplier}:</strong> {multiplier.toFixed(2)}x
+          <div style={{ color: '#888', fontSize: '0.8rem' }}>{ui[language].record}: {highMultiplier.toFixed(2)}x</div>
         </div>
       </div>
 

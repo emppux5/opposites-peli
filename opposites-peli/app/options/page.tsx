@@ -226,21 +226,21 @@ export default function Options() {
             <option>Hard</option>
           </select>
         </div>
-
-        {/* MODE */}
+{/*
         <div style={{ ...rowStyle, borderBottom: "none" }}>
           <span style={labelStyle}>{text[language].mode}</span>
-         <select
-  value={mode ?? "Endless"}                    // jos mode on null, käytä "Endless"
-  onChange={(e) => setMode(e.target.value as string)} // kerrotaan TypeScriptille, että value on string
-  style={selectStyle}
-  onFocus={(e) => (e.currentTarget.style.border = "2px solid #6a6aff")}
-  onBlur={(e) => (e.currentTarget.style.border = "2px solid #3a3a55")}
->
-  <option>Endless</option>
-  <option>Challenge</option>
-</select>
+          <select
+          value={mode ?? "Endless"}                    // jos mode on null, käytä "Endless"
+            onChange={(e) => setMode(e.target.value as string)} // kerrotaan TypeScriptille, että value on string
+            style={selectStyle}
+            onFocus={(e) => (e.currentTarget.style.border = "2px solid #6a6aff")}
+            onBlur={(e) => (e.currentTarget.style.border = "2px solid #3a3a55")}
+          >
+            <option>Endless</option>
+            <option>Challenge</option>
+          </select>
         </div>
+*/}
       </div>
 
       {/* INFO */}

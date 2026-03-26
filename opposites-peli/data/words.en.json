@@ -1,125 +1,125 @@
 {
-  "rich": ["poor", "needy", "impoverished"],
-  "poor": ["rich", "wealthy", "affluent"],
-  "wealthy": ["poor", "impoverished"],
+  "rich": ["poor", "needy", "impoverished", "destitute", "broke"],
+  "poor": ["rich", "wealthy", "affluent", "prosperous", "well-off"],
+  "wealthy": ["poor", "impoverished", "needy", "broke"],
 
-  "stupid": ["smart", "intelligent", "wise", "clever"],
-  "smart": ["stupid", "dumb", "foolish"],
-  "intelligent": ["stupid", "ignorant"],
-  "wise": ["stupid", "foolish"],
+  "stupid": ["smart", "intelligent", "wise", "clever", "bright"],
+  "smart": ["stupid", "dumb", "foolish", "ignorant", "unintelligent"],
+  "intelligent": ["stupid", "ignorant", "unintelligent", "dense"],
+  "wise": ["stupid", "foolish", "naive", "unwise"],
 
-  "big": ["small", "tiny"],
-  "small": ["big", "large", "huge"],
-  "large": ["small", "tiny"],
+  "big": ["small", "tiny", "little", "compact"],
+  "small": ["big", "large", "huge", "gigantic", "massive"],
+  "large": ["small", "tiny", "little", "miniature"],
 
-  "hot": ["cold", "cool", "lukewarm"],
-  "cold": ["hot", "warm"],
-  "warm": ["cold", "cool"],
+  "hot": ["cold", "cool", "chilly", "freezing"],
+  "cold": ["hot", "warm", "heated"],
+  "warm": ["cold", "cool", "chilly"],
 
-  "up": ["down"],
-  "down": ["up"],
+  "up": ["down", "below"],
+  "down": ["up", "above"],
 
   "left": ["right"],
-  "right": ["left", "wrong"],
-  "wrong": ["right", "correct"],
+  "right": ["left", "wrong", "incorrect"],
+  "wrong": ["right", "correct", "accurate"],
 
-  "hard": ["soft", "gentle"],
-  "soft": ["hard", "rough"],
-  "rough": ["smooth", "soft"],
-  "smooth": ["rough"],
+  "hard": ["soft", "gentle", "easy"],
+  "soft": ["hard", "rough", "firm"],
+  "rough": ["smooth", "soft", "gentle"],
+  "smooth": ["rough", "bumpy"],
 
-  "dark": ["bright", "light"],
-  "bright": ["dark", "dim"],
-  "dim": ["bright"],
+  "dark": ["bright", "light", "luminous"],
+  "bright": ["dark", "dim", "dull"],
+  "dim": ["bright", "radiant"],
 
-  "high": ["low"],
-  "low": ["high"],
+  "high": ["low", "short"],
+  "low": ["high", "tall"],
 
-  "fast": ["slow"],
-  "slow": ["fast", "quick"],
+  "fast": ["slow", "sluggish"],
+  "slow": ["fast", "quick", "rapid", "speedy"],
 
-  "old": ["young", "new"],
-  "young": ["old", "aged"],
-  "new": ["old"],
+  "old": ["young", "new", "modern"],
+  "young": ["old", "aged", "elderly"],
+  "new": ["old", "ancient", "used"],
 
-  "heavy": ["light"],
-  "light": ["heavy"],
+  "heavy": ["light", "weightless"],
+  "light": ["heavy", "dense"],
 
-  "expensive": ["cheap", "affordable"],
-  "cheap": ["expensive"],
+  "expensive": ["cheap", "affordable", "inexpensive", "budget"],
+  "cheap": ["expensive", "costly", "pricey"],
 
-  "clean": ["dirty"],
-  "dirty": ["clean"],
+  "clean": ["dirty", "filthy", "messy"],
+  "dirty": ["clean", "spotless", "pure"],
 
-  "beautiful": ["ugly"],
-  "ugly": ["beautiful"],
+  "beautiful": ["ugly", "unattractive", "plain"],
+  "ugly": ["beautiful", "attractive", "pretty"],
 
-  "strong": ["weak"],
-  "weak": ["strong"],
+  "strong": ["weak", "fragile", "feeble"],
+  "weak": ["strong", "powerful", "sturdy"],
 
-  "easy": ["difficult", "hard"],
-  "difficult": ["easy"],
+  "easy": ["difficult", "hard", "challenging"],
+  "difficult": ["easy", "simple", "effortless"],
 
-  "long": ["short"],
-  "short": ["long"],
+  "long": ["short", "brief"],
+  "short": ["long", "lengthy", "extended"],
 
-  "wide": ["narrow"],
-  "narrow": ["wide"],
+  "wide": ["narrow", "thin"],
+  "narrow": ["wide", "broad", "spacious"],
 
-  "happy": ["sad", "unhappy"],
-  "sad": ["happy"],
+  "happy": ["sad", "unhappy", "miserable"],
+  "sad": ["happy", "joyful", "cheerful"],
 
-  "full": ["empty"],
-  "empty": ["full"],
+  "full": ["empty", "vacant"],
+  "empty": ["full", "filled", "occupied"],
 
-  "good": ["bad"],
-  "bad": ["good"],
+  "good": ["bad", "evil", "poor"],
+  "bad": ["good", "excellent", "great"],
 
-  "wet": ["dry"],
-  "dry": ["wet"],
+  "wet": ["dry", "arid"],
+  "dry": ["wet", "moist", "damp"],
 
-  "open": ["closed"],
-  "closed": ["open"],
+  "open": ["closed", "shut"],
+  "closed": ["open", "unlocked"],
 
-  "truth": ["lie", "falsehood"],
-  "lie": ["truth"],
+  "truth": ["lie", "falsehood", "fiction"],
+  "lie": ["truth", "fact"],
 
-  "friend": ["enemy"],
-  "enemy": ["friend"],
+  "friend": ["enemy", "foe", "opponent"],
+  "enemy": ["friend", "ally"],
 
-  "love": ["hate"],
-  "hate": ["love"],
+  "love": ["hate", "dislike"],
+  "hate": ["love", "affection"],
 
-  "give": ["take"],
-  "take": ["give"],
+  "give": ["take", "receive"],
+  "take": ["give", "offer"],
 
   "buy": ["sell"],
-  "sell": ["buy"],
+  "sell": ["buy", "purchase"],
 
-  "come": ["go"],
-  "go": ["come"],
+  "come": ["go", "leave", "depart"],
+  "go": ["come", "arrive"],
 
-  "inside": ["outside"],
-  "outside": ["inside"],
+  "inside": ["outside", "external"],
+  "outside": ["inside", "internal"],
 
-  "more": ["less"],
-  "less": ["more"],
+  "more": ["less", "fewer"],
+  "less": ["more", "greater"],
 
-  "always": ["never", "rarely"],
-  "never": ["always"],
+  "always": ["never", "rarely", "seldom"],
+  "never": ["always", "often"],
 
-  "possible": ["impossible"],
-  "impossible": ["possible"],
+  "possible": ["impossible", "unlikely"],
+  "impossible": ["possible", "feasible"],
 
-  "safe": ["dangerous"],
-  "dangerous": ["safe"],
+  "safe": ["dangerous", "unsafe", "risky"],
+  "dangerous": ["safe", "harmless"],
 
-  "simple": ["complex"],
-  "complex": ["simple"],
+  "simple": ["complex", "complicated", "intricate"],
+  "complex": ["simple", "basic", "straightforward"],
 
-  "order": ["chaos"],
-  "chaos": ["order"],
+  "order": ["chaos", "disorder"],
+  "chaos": ["order", "organization"],
 
-  "peace": ["war"],
-  "war": ["peace"]
+  "peace": ["war", "conflict"],
+  "war": ["peace", "harmony"]
 }
